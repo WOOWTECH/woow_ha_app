@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
-private const val APPLICATION_ID = "io.homeassistant.companion.android"
+private const val APPLICATION_ID = "com.woowtech.home"
 
 /**
  * A convention plugin that applies common configurations to Android application modules.
