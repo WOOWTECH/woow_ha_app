@@ -3,10 +3,21 @@
     android:height="120dp"
     android:viewportWidth="120"
     android:viewportHeight="120">
-  <path
-      android:pathData="M120,112.38a7.5,7.5 0,0 1,-7.5 7.5H7.5a7.5,7.5 0,0 1,-7.5 -7.5v-45c0,-4.13 2.38,-9.88 5.3,-12.81l49.39,-49.39c2.91,-2.91 7.69,-2.91 10.6,0l49.4,49.4c2.91,2.91 5.3,8.68 5.3,12.81v45z"
-      android:fillColor="#18BCF2"/>
-  <path
-      android:pathData="M53.63,119.88 L33.32,99.57c-1.04,0.36 -2.16,0.56 -3.32,0.56 -5.65,0 -10.25,-4.6 -10.25,-10.25s4.6,-10.25 10.25,-10.25 10.25,4.6 10.25,10.25c0,1.16 -0.2,2.28 -0.56,3.33L55.5,109.02v-57.94c-3.4,-1.67 -5.75,-5.16 -5.75,-9.19 0,-5.65 4.6,-10.25 10.25,-10.25s10.25,4.6 10.25,10.25c0,4.03 -2.35,7.53 -5.75,9.19v40.63l15.73,-15.73c-0.31,-0.98 -0.48,-2.02 -0.48,-3.1 0,-5.65 4.6,-10.25 10.25,-10.25s10.25,4.6 10.25,10.25 -4.6,10.25 -10.25,10.25c-1.25,0 -2.44,-0.23 -3.55,-0.64L64.5,104.45v15.44z"
-      android:fillColor="#F2F4F9"/>
+    <!-- Circular background -->
+    <path
+        android:pathData="M60,0 A60,60 0 1,1 60,120 A60,60 0 1,1 60,0"
+        android:fillColor="#6183FC"/>
+    <!-- woowtech logo pattern in white, centered -->
+    <group android:translateX="20" android:translateY="30">
+        <!-- Simplified logo pattern -->
+        <path android:fillColor="#FFFFFF" android:pathData="M10,15 L10,45 L14,45 L14,15 Z"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M16,15 L24,45 L28,45 L20,15 Z"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M20,15 L28,45 L32,45 L24,15 Z"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M26,15 L26,45 L30,45 L30,15 Z"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M40,15 A8,8 0 1,1 40,31 A8,8 0 1,1 40,15 M40,19 A4,4 0 1,0 40,27 A4,4 0 1,0 40,19"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M20,29 A8,8 0 1,1 20,45 A8,8 0 1,0 20,29 M20,33 A4,4 0 1,0 20,41 A4,4 0 1,1 20,33"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M50,15 L58,45 L62,45 L54,15 Z"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M54,15 L62,45 L66,45 L58,15 Z"/>
+        <path android:fillColor="#FFFFFF" android:pathData="M60,15 L60,45 L64,45 L64,15 Z"/>
+    </group>
 </vector>
