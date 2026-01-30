@@ -534,7 +534,7 @@
     <string name="prioritize_internal_on_expanded">Use internal connection URL (use this if you typically turn location access off)</string>
     <string name="prioritize_internal_off">Use Home Assistant URL (recommended)</string>
     <string name="privacy_policy">Privacy policy</string>
-    <string name="privacy_url">https://www.home-assistant.io/privacy</string>
+    <string name="privacy_url">https://aiot.woowtech.io/privacy</string>
     <string name="open_source_credits">Based on Home Assistant Companion App (Apache 2.0 License)</string>
     <string name="woowtech_company">woowtech Smart Home Solutions</string>
     <string name="qrcode_processing_tag_error">Error while processing QR code tag</string>
@@ -1356,14 +1356,14 @@
     <string name="connection_security_level_default_summary">Only connect to the server when we are sure that connection is encrypted or you are at home</string>
     <string name="connection_security_most_secure">Most secure: Allow this app to know when you\'re home</string>
     <string name="connection_security_less_secure">Less secure: Do not allow this app to know when you\'re home</string>
-    <string name="home_assistant_branding_icon_content_description">Home\u00A0Assistant branding icon</string>
+    <string name="home_assistant_branding_icon_content_description">woowtech branding icon</string>
     <string name="loading_content_description">Loading</string>
     <string name="searching_home_network">Searching on\nhome network</string>
     <string name="server_discovery_no_server_info">Check that your Home\u00A0Assistant server is powered on and you\'re connected to the same network. You can enter the address manually if you know it.</string>
     <string name="server_discovery_connect">Connect</string>
-    <string name="welcome_home_assistant_title">Home\u00A0Assistant\nCompanion app</string>
-    <string name="welcome_details">Access your Home\u00A0Assistant server on the go.\n\nHome\u00A0Assistant is open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts.</string>
-    <string name="welcome_connect_to_ha">Connect to my Home\u00A0Assistant server</string>
+    <string name="welcome_home_assistant_title">woowtech\nHome</string>
+    <string name="welcome_details">Access your smart home server on the go.\n\nwoowtech Home puts local control and privacy first. Powered by Home\u00A0Assistant open source home automation.</string>
+    <string name="welcome_connect_to_ha">Connect to my smart home server</string>
     <string name="welcome_learn_more">Learn more</string>
     <string name="name_your_device_title">How would you like to name this device?</string>
     <string name="name_your_device_content">This is used to identify your device.</string>

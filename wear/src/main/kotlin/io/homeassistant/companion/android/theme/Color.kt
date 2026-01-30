@@ -7,7 +7,7 @@ import androidx.wear.compose.material3.ColorScheme
 import androidx.wear.compose.material3.SliderDefaults
 import androidx.wear.compose.material3.SwitchButtonDefaults
 
-val md_theme_dark_primary = Color(0xFF03A9F4)
+val md_theme_dark_primary = Color(0xFF6183FC)  // woowtech Brand Blue
 val md_theme_dark_onPrimary = Color(0xFF00344F)
 val md_theme_dark_primaryContainer = Color(0xFF004B70)
 val md_theme_dark_onPrimaryContainer = Color(0xFFCAE6FF)

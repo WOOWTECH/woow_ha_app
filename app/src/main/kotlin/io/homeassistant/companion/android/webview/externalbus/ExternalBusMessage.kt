@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 import timber.log.Timber
 
 /**
- * [External bus documentation](https://developers.home-assistant.io/docs/frontend/external-bus)
+ * [External bus documentation](https://aiot.woowtech.io/docs/frontend/external-bus)
  *
  * [External bus frontend implementation](https://github.com/home-assistant/frontend/blob/dev/src/external_app/external_messaging.ts)
  */

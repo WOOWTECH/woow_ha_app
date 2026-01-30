@@ -36,7 +36,7 @@ import io.homeassistant.companion.android.common.compose.theme.LocalHAColorSchem
 import io.homeassistant.companion.android.common.compose.theme.MaxButtonWidth
 import io.homeassistant.companion.android.common.compose.theme.defaultRippleAlpha
 
-private val buttonShape = RoundedCornerShape(size = HARadius.Pill)
+private val buttonShape = RoundedCornerShape(size = HARadius.X2L)  // 20dp - woowtech VI compliant
 
 /**
  * Defines the visual styling variants for Home Assistant buttons.
@@ -69,7 +69,7 @@ enum class ButtonSize(val value: Dp) {
  * Displays an accent button, typically used for the most prominent call to action on a screen.
  * The button's appearance is determined by the [variant] and the current theme.
  *
- * [Design Website](https://design.home-assistant.io/#components/ha-button)
+ * [Design Website](https://aiot.woowtech.io/#components/ha-button)
  *
  * @param text The text label displayed on the button.
  * @param onClick The lambda function to be executed when the button is clicked.
@@ -116,7 +116,7 @@ fun HAAccentButton(
  * Displays a filled button, which is a standard button.
  * The button's appearance is determined by the [variant] and the current theme.
  *
- * [Design Website](https://design.home-assistant.io/#components/ha-button)
+ * [Design Website](https://aiot.woowtech.io/#components/ha-button)
  *
  * @param text The text label displayed on the button.
  * @param onClick The lambda function to be executed when the button is clicked.
@@ -163,7 +163,7 @@ fun HAFilledButton(
  * Displays a plain button, which is typically a text-only button with no background fill.
  * The button's appearance is determined by the [variant] and the current theme.
  *
- * [Design Website](https://design.home-assistant.io/#components/ha-button)
+ * [Design Website](https://aiot.woowtech.io/#components/ha-button)
  *
  * @param text The text label displayed on the button.
  * @param onClick The lambda function to be executed when the button is clicked.

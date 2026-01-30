@@ -17,7 +17,7 @@ abstract class NotificationMenuProvider : MenuProvider {
             intent =
                 Intent(
                     Intent.ACTION_VIEW,
-                    "https://companion.home-assistant.io/docs/notifications/notifications-basic".toUri(),
+                    "https://aiot.woowtech.io/docs/notifications/notifications-basic".toUri(),
                 )
         }
     }

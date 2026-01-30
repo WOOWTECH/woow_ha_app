@@ -211,10 +211,10 @@
             android:key="docs"
             android:icon="@drawable/ic_question"
             android:title="@string/documentation"
-            android:summary="https://companion.home-assistant.io"
+            android:summary="https://aiot.woowtech.io"
             app:enableCopying="true">
             <intent android:action="android.intent.action.VIEW"
-                android:data="https://companion.home-assistant.io" />
+                android:data="https://aiot.woowtech.io" />
         </Preference>
         <Preference
             android:key="developer"

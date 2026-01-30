@@ -134,7 +134,7 @@ internal class NameYourDeviceNavigationTest : BaseOnboardingNavigationTest() {
             )
         }
         testNavigation(hasLocationTracking = false) {
-            navController.navigateToNameYourDevice("https://www.home-assistant.io", "code")
+            navController.navigateToNameYourDevice("https://aiot.woowtech.io", "code")
             assertTrue(navController.currentBackStackEntry?.destination?.hasRoute<NameYourDeviceRoute>() == true)
 
             onNodeWithText(stringResource(commonR.string.name_your_device_save))

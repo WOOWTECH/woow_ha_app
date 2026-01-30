@@ -39,7 +39,7 @@ class PressureSensorManager :
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#pressure-sensor"
+        return "https://aiot.woowtech.io/docs/core/sensors#pressure-sensor"
     }
 
     override val name: Int

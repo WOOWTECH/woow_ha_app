@@ -38,7 +38,7 @@ class ProximitySensorManager :
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#proximity-sensor"
+        return "https://aiot.woowtech.io/docs/core/sensors#proximity-sensor"
     }
 
     override val name: Int

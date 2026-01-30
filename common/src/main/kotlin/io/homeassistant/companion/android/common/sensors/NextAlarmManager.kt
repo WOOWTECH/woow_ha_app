@@ -33,7 +33,7 @@ class NextAlarmManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#next-alarm-sensor"
+        return "https://aiot.woowtech.io/docs/core/sensors#next-alarm-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_alarm

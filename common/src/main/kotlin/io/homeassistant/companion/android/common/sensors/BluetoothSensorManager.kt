@@ -162,7 +162,7 @@ class BluetoothSensorManager : SensorManager {
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#bluetooth-sensors"
+        return "https://aiot.woowtech.io/docs/core/sensors#bluetooth-sensors"
     }
 
     override val name: Int

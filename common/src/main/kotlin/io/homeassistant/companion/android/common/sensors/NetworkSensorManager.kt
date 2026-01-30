@@ -114,7 +114,7 @@ class NetworkSensorManager : SensorManager {
             commonR.string.basic_sensor_name_public_ip,
             commonR.string.sensor_description_public_ip,
             "mdi:ip",
-            docsLink = "https://companion.home-assistant.io/docs/core/sensors#public-ip-sensor",
+            docsLink = "https://aiot.woowtech.io/docs/core/sensors#public-ip-sensor",
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
         )
         val ip6Addresses = SensorManager.BasicSensor(
@@ -135,7 +135,7 @@ class NetworkSensorManager : SensorManager {
             commonR.string.sensor_description_network_type,
             "mdi:network",
             deviceClass = "enum",
-            docsLink = "https://companion.home-assistant.io/docs/core/sensors#network-type-sensor",
+            docsLink = "https://aiot.woowtech.io/docs/core/sensors#network-type-sensor",
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
             updateType = SensorManager.BasicSensor.UpdateType.INTENT,
         )
@@ -143,7 +143,7 @@ class NetworkSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#connection-type-sensor"
+        return "https://aiot.woowtech.io/docs/core/sensors#connection-type-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_network

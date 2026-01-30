@@ -21,7 +21,7 @@ class TheaterModeSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/wear-os/sensors"
+        return "https://aiot.woowtech.io/docs/wear-os/sensors"
     }
     override val name: Int
         get() = commonR.string.sensor_name_theater_mode

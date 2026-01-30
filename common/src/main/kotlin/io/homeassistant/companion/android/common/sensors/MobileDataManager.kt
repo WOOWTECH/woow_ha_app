@@ -32,7 +32,7 @@ class MobileDataManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#mobile-data-sensors"
+        return "https://aiot.woowtech.io/docs/core/sensors#mobile-data-sensors"
     }
 
     override val name: Int

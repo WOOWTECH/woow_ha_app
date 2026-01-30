@@ -105,7 +105,7 @@ class HealthServicesSensorManager : SensorManager {
     private val areHealthServicesSensorApisAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/wear-os/sensors#health-services"
+        return "https://aiot.woowtech.io/docs/wear-os/sensors#health-services"
     }
 
     override val name: Int

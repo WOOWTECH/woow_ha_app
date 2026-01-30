@@ -67,6 +67,7 @@ object HASize {
 
 /**
  * Object defining radius constants for Home Assistant UI components.
+ * woowtech VI System mandates 20px (X2L) as the standard corner radius.
  */
 object HARadius {
     /** Square radius (0dp). */
@@ -84,8 +85,11 @@ object HARadius {
     /** Extra large radius (16dp, equivalent to 1rem). */
     val XL = 16.dp
 
-    /** Extra extra large radius (20dp, equivalent to 1.25rem). */
+    /** Extra extra large radius (20dp, equivalent to 1.25rem). woowtech VI Standard. */
     val X2L = 20.dp
+
+    /** Standard radius - woowtech VI compliant (20dp). Use this for all cards, buttons, containers. */
+    val Standard = X2L
 
     /** Extra extra extra large radius (24dp, equivalent to 1.5rem). */
     val X3L = 24.dp

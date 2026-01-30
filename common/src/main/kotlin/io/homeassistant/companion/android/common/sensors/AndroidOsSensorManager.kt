@@ -27,7 +27,7 @@ class AndroidOsSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#android-os-sensors"
+        return "https://aiot.woowtech.io/docs/core/sensors#android-os-sensors"
     }
 
     override val name: Int

@@ -57,7 +57,7 @@ class TagReaderActivity : BaseActivity() {
     }
 
     private suspend fun handleTag(url: Uri?, isNfcTag: Boolean) {
-        // https://www.home-assistant.io/tag/5f0ba733-172f-430d-a7f8-e4ad940c88d7
+        // https://aiot.woowtech.io/tag/5f0ba733-172f-430d-a7f8-e4ad940c88d7
 
         val nfcTagId = UrlUtil.splitNfcTagId(url)
         Timber.d("Tag ID: $nfcTagId")

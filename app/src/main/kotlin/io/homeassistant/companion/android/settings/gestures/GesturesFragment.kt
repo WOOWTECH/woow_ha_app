@@ -35,6 +35,6 @@ class GesturesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://companion.home-assistant.io/docs/integrations/gestures")
+        addHelpMenuProvider("https://aiot.woowtech.io/docs/integrations/gestures")
     }
 }

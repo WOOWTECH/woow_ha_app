@@ -31,7 +31,7 @@ fun HAModalBottomSheet(
         sheetState = bottomSheetState,
         scrimColor = LocalHAColorScheme.current.colorOverlayModal,
         onDismissRequest = onDismissRequest,
-        shape = RoundedCornerShape(topStart = HARadius.X3L, topEnd = HARadius.X3L),
+        shape = RoundedCornerShape(topStart = HARadius.X2L, topEnd = HARadius.X2L),  // 20dp - woowtech VI compliant
         content = content,
     )
 }

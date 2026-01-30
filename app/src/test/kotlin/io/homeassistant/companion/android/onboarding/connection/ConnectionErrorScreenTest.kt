@@ -100,11 +100,11 @@ class ConnectionErrorScreenTest {
 
             onNodeWithContentDescription(stringResource(commonR.string.connection_error_documentation_content_description))
                 .performScrollTo().assertIsDisplayed().performClick()
-            assertEquals("https://companion.home-assistant.io/docs/troubleshooting/faqs/", urlClicked)
+            assertEquals("https://aiot.woowtech.io/docs/troubleshooting/faqs/", urlClicked)
 
             onNodeWithContentDescription(stringResource(commonR.string.connection_error_forum_content_description))
                 .performScrollTo().assertIsDisplayed().performClick()
-            assertEquals("https://community.home-assistant.io/c/mobile-apps/android-companion/42", urlClicked)
+            assertEquals("https://aiot.woowtech.io/c/mobile-apps/android-companion/42", urlClicked)
 
             onNodeWithContentDescription(stringResource(commonR.string.connection_error_github_content_description))
                 .performScrollTo().assertIsDisplayed().performClick()

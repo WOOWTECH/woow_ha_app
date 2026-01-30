@@ -18,7 +18,7 @@ class DevicePolicyManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#work-profile-sensor"
+        return "https://aiot.woowtech.io/docs/core/sensors#work-profile-sensor"
     }
 
     private var isManagedProfileAvailable: Boolean? = null

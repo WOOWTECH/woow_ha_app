@@ -17,7 +17,7 @@ class NfcSensorManager : SensorManager {
         )
     }
 
-    override fun docsLink() = "https://companion.home-assistant.io/docs/core/sensors#nfc-state-sensor"
+    override fun docsLink() = "https://aiot.woowtech.io/docs/core/sensors#nfc-state-sensor"
     override val name = commonR.string.sensor_name_nfc
 
     override suspend fun getAvailableSensors(context: Context) = listOf(nfcStateSensor)

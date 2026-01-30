@@ -40,7 +40,7 @@ class NotificationSensorManager :
             commonR.string.basic_sensor_name_last_notification,
             commonR.string.sensor_description_last_notification,
             "mdi:bell-ring",
-            docsLink = "https://companion.home-assistant.io/docs/core/sensors#last-notification",
+            docsLink = "https://aiot.woowtech.io/docs/core/sensors#last-notification",
             updateType = SensorManager.BasicSensor.UpdateType.INTENT_ONLY,
         )
         val lastRemovedNotification = SensorManager.BasicSensor(
@@ -49,7 +49,7 @@ class NotificationSensorManager :
             commonR.string.basic_sensor_name_last_removed_notification,
             commonR.string.sensor_description_last_removed_notification,
             "mdi:bell-ring",
-            docsLink = "https://companion.home-assistant.io/docs/core/sensors#last-removed-notification",
+            docsLink = "https://aiot.woowtech.io/docs/core/sensors#last-removed-notification",
             updateType = SensorManager.BasicSensor.UpdateType.INTENT_ONLY,
         )
         val activeNotificationCount = SensorManager.BasicSensor(
@@ -59,7 +59,7 @@ class NotificationSensorManager :
             commonR.string.sensor_description_active_notification_count,
             "mdi:bell-ring",
             unitOfMeasurement = "notifications",
-            docsLink = "https://companion.home-assistant.io/docs/core/sensors#active-notification-count",
+            docsLink = "https://aiot.woowtech.io/docs/core/sensors#active-notification-count",
             stateClass = SensorManager.STATE_CLASS_MEASUREMENT,
             updateType = SensorManager.BasicSensor.UpdateType.INTENT,
         )
@@ -70,12 +70,12 @@ class NotificationSensorManager :
             commonR.string.sensor_description_media_session,
             "mdi:play-circle",
             deviceClass = "enum",
-            docsLink = "https://companion.home-assistant.io/docs/core/sensors#media-session-sensor",
+            docsLink = "https://aiot.woowtech.io/docs/core/sensors#media-session-sensor",
         )
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#notification-sensors"
+        return "https://aiot.woowtech.io/docs/core/sensors#notification-sensors"
     }
     override fun hasSensor(context: Context): Boolean {
         return if (!context.isAutomotive()) {

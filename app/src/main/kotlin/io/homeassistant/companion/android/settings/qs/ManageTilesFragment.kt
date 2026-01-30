@@ -52,7 +52,7 @@ class ManageTilesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://companion.home-assistant.io/docs/integrations/android-quick-settings")
+        addHelpMenuProvider("https://aiot.woowtech.io/docs/integrations/android-quick-settings")
     }
 
     override fun onResume() {

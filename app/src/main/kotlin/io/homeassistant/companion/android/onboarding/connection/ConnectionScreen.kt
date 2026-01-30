@@ -120,7 +120,7 @@ private fun ErrorPlaceholder() {
 private fun ConnectionScreenPreview() {
     HAThemeForPreview {
         ConnectionScreen(
-            url = "https://www.home-assistant.io",
+            url = "https://aiot.woowtech.io",
             isLoading = false,
             isError = false,
             webViewClient = WebViewClient(),

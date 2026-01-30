@@ -2,7 +2,6 @@ package io.homeassistant.companion.android.onboarding.connection
 
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -20,8 +19,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.Forum
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Newspaper
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +50,7 @@ import io.homeassistant.companion.android.common.compose.composable.HABanner
 import io.homeassistant.companion.android.common.compose.composable.HADetails
 import io.homeassistant.companion.android.common.compose.composable.HAIconButton
 import io.homeassistant.companion.android.common.compose.composable.HATopBarPlaceholder
+import io.homeassistant.companion.android.common.compose.theme.HABrandColors
 import io.homeassistant.companion.android.common.compose.theme.HADimens
 import io.homeassistant.companion.android.common.compose.theme.HATextStyle
 import io.homeassistant.companion.android.common.compose.theme.HAThemeForPreview
@@ -60,8 +64,8 @@ private val MaxContentWidth = MaxButtonWidth
 @VisibleForTesting
 internal const val URL_INFO_TAG = "url_info"
 
-private const val URL_DOCUMENTATION = "https://companion.home-assistant.io/docs/troubleshooting/faqs/"
-private const val URL_COMMUNITY_FORUM = "https://community.home-assistant.io/c/mobile-apps/android-companion/42"
+private const val URL_DOCUMENTATION = "https://aiot.woowtech.io/docs/troubleshooting/faqs/"
+private const val URL_COMMUNITY_FORUM = "https://aiot.woowtech.io/c/mobile-apps/android-companion/42"
 private const val URL_GITHUB_ISSUES = "https://github.com/home-assistant/android/issues"
 private const val URL_DISCORD = "https://discord.com/channels/330944238910963714/1284965926336335993"
 
@@ -99,15 +103,16 @@ internal fun ConnectionErrorScreen(
     errorDetailsExpanded: Boolean = false,
 ) {
     error?.let { error ->
+        // Use MDI icons with brand blue color instead of custom casita icons
         val icon = when (error) {
-            is ConnectionError.AuthenticationError -> R.drawable.ic_casita_crying
-            is ConnectionError.UnknownError -> R.drawable.ic_casita_problem
-            is ConnectionError.UnreachableError -> R.drawable.ic_casita_no_connection
+            is ConnectionError.AuthenticationError -> Icons.Outlined.Lock
+            is ConnectionError.UnknownError -> Icons.Outlined.Warning
+            is ConnectionError.UnreachableError -> Icons.Outlined.CloudOff
         }
 
         ConnectionErrorScreen(
             onOpenExternalLink = onOpenExternalLink,
-            icon = ImageVector.vectorResource(icon),
+            icon = icon,
             title = stringResource(error.title),
             subtitle = stringResource(error.message),
             url = url,
@@ -207,15 +212,16 @@ private fun ConnectionErrorContent(
 
 @Composable
 private fun ColumnScope.Header(icon: ImageVector, title: String, subtitle: String) {
-    Image(
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = HABrandColors.Blue,
         modifier = Modifier
             // This padding and size are adjusted to have image
             // aligned with the one in the other onboarding screens
             .padding(top = HADimens.SPACE6)
             .padding(all = 20.dp)
             .size(120.dp),
-        imageVector = icon,
-        contentDescription = null,
     )
 
     Text(
@@ -387,7 +393,7 @@ private fun ConnectionErrorScreenPreview() {
             url = "http://ha.org",
             connectivityCheckState = ConnectivityCheckState(),
             onRetryConnectivityCheck = {},
-            icon = ImageVector.vectorResource(R.drawable.ic_casita_no_connection),
+            icon = Icons.Outlined.CloudOff,
             errorDetailsExpanded = true,
             actions = {
                 CloseAction { }

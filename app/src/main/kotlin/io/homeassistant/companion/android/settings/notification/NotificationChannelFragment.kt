@@ -33,7 +33,7 @@ class NotificationChannelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         addHelpMenuProvider(
-            "https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-channels",
+            "https://aiot.woowtech.io/docs/notifications/notifications-basic#notification-channels",
         )
     }
 

@@ -37,7 +37,7 @@ class OnBodySensorManager :
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/wear-os/sensors"
+        return "https://aiot.woowtech.io/docs/wear-os/sensors"
     }
 
     override val name: Int

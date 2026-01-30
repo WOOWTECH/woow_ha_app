@@ -37,44 +37,44 @@ private object HAColors {
     val White = Color(0xFFFFFFFF)
     val Transparent = Color(0x00FFFFFF)
 
-    // Primary
-    val Primary05 = Color(0xFF001721)
-    val Primary10 = Color(0xFF002E3E)
-    val Primary20 = Color(0xFF004156)
-    val Primary30 = Color(0xFF006787)
-    val Primary40 = Color(0xFF009AC7)
-    val Primary50 = Color(0xFF18BCF2)
-    val Primary60 = Color(0xFF37C8FD)
-    val Primary70 = Color(0xFF7BD4FB)
-    val Primary80 = Color(0xFFB9E6FC)
-    val Primary90 = Color(0xFFDFF3FC)
-    val Primary95 = Color(0xFFEFF9FE)
+    // Primary - woowtech Brand Blue (#6183FC) based scale
+    val Primary05 = Color(0xFF0D164D)
+    val Primary10 = Color(0xFF172570)
+    val Primary20 = Color(0xFF283B93)
+    val Primary30 = Color(0xFF3A52B6)
+    val Primary40 = Color(0xFF4D6AD9)
+    val Primary50 = Color(0xFF6183FC)  // woowtech Brand Blue
+    val Primary60 = Color(0xFF879FFC)
+    val Primary70 = Color(0xFFA5B7FF)
+    val Primary80 = Color(0xFFC3CFFF)
+    val Primary90 = Color(0xFFE1E7FF)
+    val Primary95 = Color(0xFFF0F3FF)
 
-    // Blue
-    val Blue05 = Color(0xFF000F35)
-    val Blue10 = Color(0xFF001A4E)
-    val Blue20 = Color(0xFF002D77)
-    val Blue30 = Color(0xFF003F9C)
-    val Blue40 = Color(0xFF0053C0)
-    val Blue50 = Color(0xFF0071EC)
-    val Blue60 = Color(0xFF3E96FF)
-    val Blue70 = Color(0xFF6EB3FF)
-    val Blue80 = Color(0xFF9FCEFF)
-    val Blue90 = Color(0xFFD1E8FF)
-    val Blue95 = Color(0xFFE8F3FF)
+    // Blue - woowtech Brand Blue (#6183FC) based scale (same as Primary)
+    val Blue05 = Color(0xFF0D164D)
+    val Blue10 = Color(0xFF172570)
+    val Blue20 = Color(0xFF283B93)
+    val Blue30 = Color(0xFF3A52B6)
+    val Blue40 = Color(0xFF4D6AD9)
+    val Blue50 = Color(0xFF6183FC)  // woowtech Brand Blue
+    val Blue60 = Color(0xFF879FFC)
+    val Blue70 = Color(0xFFA5B7FF)
+    val Blue80 = Color(0xFFC3CFFF)
+    val Blue90 = Color(0xFFE1E7FF)
+    val Blue95 = Color(0xFFF0F3FF)
 
-    // Brand
-    val Brand05 = Color(0xFF00222F)
-    val Brand10 = Color(0xFF003D51)
-    val Brand20 = Color(0xFF004E67)
-    val Brand30 = Color(0xFF007093)
-    val Brand40 = Color(0xFF00A4D4)
-    val Brand50 = Color(0xFF1FBCF1)
-    val Brand60 = Color(0xFF37C8FD)
-    val Brand70 = Color(0xFF7BD4FB)
-    val Brand80 = Color(0xFFB9E6FC)
-    val Brand90 = Color(0xFFDFF3FC)
-    val Brand95 = Color(0xFFEFF9FE)
+    // Brand - woowtech Brand Blue (#6183FC) based scale (mirrors Primary)
+    val Brand05 = Color(0xFF0D164D)
+    val Brand10 = Color(0xFF172570)
+    val Brand20 = Color(0xFF283B93)
+    val Brand30 = Color(0xFF3A52B6)
+    val Brand40 = Color(0xFF4D6AD9)
+    val Brand50 = Color(0xFF6183FC)  // woowtech Brand Blue
+    val Brand60 = Color(0xFF879FFC)
+    val Brand70 = Color(0xFFA5B7FF)
+    val Brand80 = Color(0xFFC3CFFF)
+    val Brand90 = Color(0xFFE1E7FF)
+    val Brand95 = Color(0xFFF0F3FF)
 
     // Cyan
     val Cyan05 = Color(0xFF00151B)
@@ -194,11 +194,18 @@ private object HAColors {
     val Yellow95 = Color(0xFFFEF3CD)
 }
 
-// TODO validate with design team if this color are immutable or not (not changeable by the users and also stay the same
-//  in dark mode)
+/**
+ * woowtech Brand Colors - VI System compliant
+ * Primary Brand Blue: #6183FC
+ * Text Primary: #212121
+ * Text Secondary: #646262
+ * Background: #FFFFFF
+ */
 object HABrandColors {
-    val Blue = Color(0xFF18BCF2)
-    val Background = Color(0xFFF2F4F9)
+    val Blue = Color(0xFF6183FC)  // woowtech Brand Blue
+    val Background = Color(0xFFFFFFFF)  // VI System background
+    val TextPrimary = Color(0xFF212121)  // VI System text primary
+    val TextSecondary = Color(0xFF646262)  // VI System text secondary
 }
 
 @Immutable

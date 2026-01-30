@@ -11,7 +11,7 @@ import io.homeassistant.companion.android.onboarding.wearmtls.WearMTLSScreen
 import kotlinx.serialization.Serializable
 
 internal const val URL_MTLS_DOCUMENTATION =
-    "https://companion.home-assistant.io/docs/getting_started/#tls-client-authentication"
+    "https://aiot.woowtech.io/docs/getting_started/#tls-client-authentication"
 
 @Serializable
 internal class WearMTLSRoute(val deviceName: String, val serverUrl: String, val authCode: String)

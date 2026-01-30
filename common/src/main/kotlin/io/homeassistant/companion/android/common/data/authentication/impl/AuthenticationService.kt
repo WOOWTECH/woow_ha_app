@@ -11,7 +11,7 @@ import retrofit2.http.Url
 interface AuthenticationService {
 
     companion object {
-        const val CLIENT_ID = "https://home-assistant.io/android"
+        const val CLIENT_ID = "https://aiot.woowtech.io/android"
         const val GRANT_TYPE_CODE = "authorization_code"
         const val GRANT_TYPE_REFRESH = "refresh_token"
         const val REVOKE_ACTION = "revoke"

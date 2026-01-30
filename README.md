@@ -1,67 +1,103 @@
-# Home Assistant Companion for Android
+# woowtech Home
 
-[![Build Status](https://github.com/home-assistant/android/actions/workflows/onPush.yml/badge.svg)](https://github.com/home-assistant/android/actions/workflows/onPush.yml)  
-[![Play Store](https://img.shields.io/badge/Play%20Store-Download-blue?logo=google-play)](https://play.google.com/store/apps/details?id=io.homeassistant.companion.android)
-[![Play Store Beta](https://img.shields.io/badge/Play%20Store%20Beta-Download-blue?logo=google-play)](https://play.google.com/apps/testing/io.homeassistant.companion.android)
-[![Discord](https://img.shields.io/discord/330944238910963714?label=Discord&logo=discord)](https://discord.gg/c5DvZ4e)
-[![Stars](https://img.shields.io/github/stars/home-assistant/android?style=social)](https://github.com/home-assistant/android/stargazers)
+The official woowtech Home Android companion app for smart home control.
 
-Welcome to the **Home Assistant Companion for Android**! This is the official Android app for [Home Assistant](https://www.home-assistant.io/), a powerful open-source home automation platform. Join us in building an app used by millions of users worldwide.
+## Overview
 
----
+woowtech Home is a mobile companion app that connects to your woowtech smart home server at `https://aiot.woowtech.io`. It provides local control and privacy-first smart home automation powered by Home Assistant open source technology.
 
 ## Features
 
-- **Control Your Smart Home**: Seamlessly interact with your Home Assistant instance.
-- **Native Android Experience**: Leverage Android-specific features like widgets, notifications, and location tracking.
-- **Customizable**: Tailor the app to your needs with themes, dashboards, and more.
-- **Open Source**: Contribute to a project that empowers users to take control of their smart homes.
+- **Remote Access**: Control your smart home from anywhere
+- **Local Control**: Direct connection to your home server when on the same network
+- **Sensors**: Background sensor collection for automation triggers
+- **Notifications**: Push notifications for alerts and automations
+- **Widgets**: Home screen widgets for quick device control
+- **Wear OS**: Support for Wear OS smartwatches
+- **Android Auto**: Integration with Android Auto for in-car control
 
-## Get the app
+## Branding
 
-- **[Download from the Play Store](https://play.google.com/store/apps/details?id=io.homeassistant.companion.android)**  
-  Join the [Play Store Beta](https://play.google.com/apps/testing/io.homeassistant.companion.android) to test new features early.
-- **Other Stores**: The app is also available in other app stores.
+| Property | Value |
+|----------|-------|
+| Primary Color | #6183FC (woowtech Brand Blue) |
+| App Name | woowtech Home |
+| Package ID | com.woowtech.home |
+| Server URL | https://aiot.woowtech.io |
 
-## Documentation
+## Building
 
-Looking for help? Check out the [Home Assistant Companion Documentation](https://companion.home-assistant.io/) for detailed guides on using the app.
+### Requirements
 
-## Report a bug or request a feature
+- JDK 17+
+- Android SDK
+- Gradle
 
-Found a bug or have an idea for a new feature? Let us know!  
+### Debug Build
 
-- **[Open a Bug Report](https://github.com/home-assistant/android/issues/new?template=Bug_report.md)**  
-- **[Request a Feature](https://github.com/home-assistant/android/issues/new?template=feature_request.md)**  
+```bash
+./gradlew assembleFullDebug
+```
 
-We appreciate your feedback and contributions to make the app even better!
+### Release Build
 
-## Contributing
+```bash
+./gradlew assembleFullRelease
+```
 
-We are thrilled to welcome contributions from the community! This app exists thanks to the incredible efforts of the Home Assistant community. Whether you're fixing bugs, adding new features, or improving documentation, your contributions make a difference.
+## APK Location
 
-Every contribution, big or small, is greatly appreciated. Together, we can make the Home Assistant Companion for Android even better!
+After building, the APK can be found at:
+```
+app/build/outputs/apk/full/debug/app-full-debug.apk
+```
 
-### Getting started
+## Server Configuration
 
-1. Read the [Developer Guide](https://developers.home-assistant.io/docs/android/).
-2. Fork the repository and create a branch for your changes.
-3. Submit a pull request and join the discussion!
+The app connects to:
+- **Server URL**: https://aiot.woowtech.io
+- **OAuth Client ID**: https://aiot.woowtech.io/android
 
-## Join the community
+## Architecture
 
-Connect with other contributors and users in our vibrant **[Discord Community](https://discord.gg/c5DvZ4e)**: Join the **[#Android](https://discord.com/channels/330944238910963714/1346948551892009101)** channel to chat with developers and contributors.
+| Component | Technology |
+|-----------|------------|
+| Language | Kotlin |
+| UI Framework | Jetpack Compose |
+| Dependency Injection | Hilt |
+| Networking | Retrofit + OkHttp WebSocket |
+| Database | Room |
+| Serialization | Kotlinx.serialization |
 
-## Star the repository
+## Modules
 
-If you find this project useful, consider giving it a star on GitHub!  
-It helps others discover the project and motivates us to keep improving.
+| Module | Description |
+|--------|-------------|
+| `:app` | Main mobile application |
+| `:wear` | Wear OS application |
+| `:automotive` | Android Automotive version |
+| `:common` | Shared code across all apps |
 
-<a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=179008173" target="_blank" style="display: block" align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=179008173&image_size=auto&color_scheme=dark" width="721" height="auto">
-    <img alt="Star History of home-assistant/android" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=179008173&image_size=auto&color_scheme=light" width="721" height="auto">
-  </picture>
-</a>
+## Code Quality
 
-[![Home Assistant - A project from the Open Home Foundation](https://www.openhomefoundation.org/badges/home-assistant.png)](https://www.openhomefoundation.org/)
+```bash
+# Format code
+./gradlew ktlintFormat
+
+# Check code style
+./gradlew ktlintCheck
+
+# Run tests
+./gradlew test
+
+# Run linter
+./gradlew lint
+```
+
+## License
+
+Based on Home Assistant Companion for Android - Open Source Home Automation.
+
+---
+
+**woowtech** - Smart Home Solutions

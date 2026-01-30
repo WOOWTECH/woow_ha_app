@@ -945,7 +945,7 @@ class HealthConnectSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#health-connect-sensors"
+        return "https://aiot.woowtech.io/docs/core/sensors#health-connect-sensors"
     }
 
     override suspend fun getAvailableSensors(context: Context): List<SensorManager.BasicSensor> {

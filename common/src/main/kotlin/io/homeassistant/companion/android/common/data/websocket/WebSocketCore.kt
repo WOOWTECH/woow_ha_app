@@ -25,7 +25,7 @@ import okhttp3.OkHttpClient
  *
  * All the method are thread safe.
  *
- * For reference check [Websocket core documentation](https://developers.home-assistant.io/docs/api/websocket/)
+ * For reference check [Websocket core documentation](https://aiot.woowtech.io/docs/api/websocket/)
  */
 internal interface WebSocketCore {
     /**

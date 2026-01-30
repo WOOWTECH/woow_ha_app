@@ -94,7 +94,7 @@ class SensorSettingsFragment : Fragment() {
                         it.intent =
                             Intent(
                                 ACTION_VIEW,
-                                "https://companion.home-assistant.io/docs/core/sensors#android-sensors".toUri(),
+                                "https://aiot.woowtech.io/docs/core/sensors#android-sensors".toUri(),
                             )
                     }
                 }

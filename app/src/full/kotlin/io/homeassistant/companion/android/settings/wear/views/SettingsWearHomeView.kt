@@ -25,7 +25,7 @@ import io.homeassistant.companion.android.settings.wear.SettingsWearViewModel
 import io.homeassistant.companion.android.util.compose.HomeAssistantAppTheme
 import io.homeassistant.companion.android.util.safeTopWindowInsets
 
-const val WEAR_DOCS_LINK = "https://companion.home-assistant.io/docs/wear-os/"
+const val WEAR_DOCS_LINK = "https://aiot.woowtech.io/docs/wear-os/"
 
 @Composable
 fun LoadSettingsHomeView(

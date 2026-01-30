@@ -49,7 +49,7 @@ class ManageControlsSettingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://companion.home-assistant.io/docs/integrations/android-device-controls")
+        addHelpMenuProvider("https://aiot.woowtech.io/docs/integrations/android-device-controls")
     }
 
     override fun onResume() {

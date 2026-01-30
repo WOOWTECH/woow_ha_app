@@ -169,7 +169,7 @@ class UrlUtilTest {
     @Test
     fun `Given URL with public domain resolving to public IP when checking isPubliclyAccessible then returns true`() = runTest {
         // Using a well-known public domain that should resolve to public IPs
-        val url = URL("https://www.home-assistant.io")
+        val url = URL("https://aiot.woowtech.io")
         assertTrue(url.isPubliclyAccessible())
     }
 

@@ -200,7 +200,7 @@ class ActivitySensorManager :
     }
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#activity-sensors"
+        return "https://aiot.woowtech.io/docs/core/sensors#activity-sensors"
     }
 
     override val name: Int

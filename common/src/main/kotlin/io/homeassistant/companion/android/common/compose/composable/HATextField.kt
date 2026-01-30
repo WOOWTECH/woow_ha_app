@@ -70,7 +70,7 @@ fun HATextField(
         supportingText = supportingText,
         trailingIcon = trailingIcon,
         leadingIcon = leadingIcon,
-        shape = RoundedCornerShape(size = HARadius.M),
+        shape = RoundedCornerShape(size = HARadius.X2L),  // 20dp - woowtech VI compliant
         maxLines = maxLines,
         singleLine = singleLine,
         // The color is controlled from the [colors] attribute

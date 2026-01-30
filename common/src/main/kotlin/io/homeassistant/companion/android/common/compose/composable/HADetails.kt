@@ -52,7 +52,7 @@ fun HADetails(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(defaultExpanded) }
-    val shape = RoundedCornerShape(HARadius.L)
+    val shape = RoundedCornerShape(HARadius.X2L)  // 20dp - woowtech VI compliant
 
     Column(
         modifier = modifier

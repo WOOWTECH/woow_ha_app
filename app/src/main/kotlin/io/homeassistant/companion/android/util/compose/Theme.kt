@@ -22,8 +22,8 @@ import io.homeassistant.companion.android.common.compose.theme.DarkHAColorScheme
 import io.homeassistant.companion.android.common.compose.theme.LightHAColorScheme
 import io.homeassistant.companion.android.common.compose.theme.LocalHAColorScheme
 
-val colorPrimary = Color(0xFF03A9F4)
-val colorPrimaryDark = Color(0xFF0288D1)
+val colorPrimary = Color(0xFF6183FC)      // woowtech Brand Blue
+val colorPrimaryDark = Color(0xFF4D6AD9)  // woowtech Brand Blue darker variant
 val darkColorBackground = Color(0xFF1C1C1C)
 
 const val STEP_SCREEN_MAX_WIDTH_DP = 600.0f

@@ -95,7 +95,7 @@ fun LoadNfcView(viewModel: NfcViewModel, startDestination: String, pressedUpAtRo
                             val intent =
                                 Intent(
                                     Intent.ACTION_VIEW,
-                                    "https://companion.home-assistant.io/docs/integrations/universal-links".toUri(),
+                                    "https://aiot.woowtech.io/docs/integrations/universal-links".toUri(),
                                 )
                             context.startActivity(intent)
                         },

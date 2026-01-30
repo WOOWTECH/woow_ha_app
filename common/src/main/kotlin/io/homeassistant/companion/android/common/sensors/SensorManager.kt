@@ -70,7 +70,7 @@ interface SensorManager {
      * URL to a documentation page that describes this sensor
      */
     fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors"
+        return "https://aiot.woowtech.io/docs/core/sensors"
     }
 
     /**

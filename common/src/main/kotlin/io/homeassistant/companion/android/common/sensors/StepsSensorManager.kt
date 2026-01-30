@@ -37,7 +37,7 @@ class StepsSensorManager :
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     override fun docsLink(): String {
-        return "https://companion.home-assistant.io/docs/core/sensors#pedometer-sensors"
+        return "https://aiot.woowtech.io/docs/core/sensors#pedometer-sensors"
     }
 
     override val name: Int
