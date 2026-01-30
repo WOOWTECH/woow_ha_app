@@ -238,7 +238,7 @@
             android:key="changelog_github"
             android:title="@string/changelog"
             android:icon="@drawable/ic_github"
-            android:summary="https://github.com/home-assistant/android/releases"
+            android:summary="https://aiot.woowtech.io/"
             app:enableCopying="true" />
         <Preference
             android:key="version"
