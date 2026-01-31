@@ -349,6 +349,7 @@ common/src/main/res/*/strings.xml
 app/src/main/res/xml/locales_config.xml
 wear/src/main/res/xml/locales_config.xml
 !common/src/main/res/values/strings.xml
+!common/src/main/res/values-zh-rTW/strings.xml
 
 ## Avoid to push secrets from CI or localy
 firebaseAppDistributionServiceCredentialsFile.json
