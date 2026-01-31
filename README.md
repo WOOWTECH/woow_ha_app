@@ -1,5 +1,7 @@
 # woowtech Home
 
+[繁體中文](README.zh-TW.md)
+
 The official woowtech Home Android companion app for smart home control.
 
 ## Overview
