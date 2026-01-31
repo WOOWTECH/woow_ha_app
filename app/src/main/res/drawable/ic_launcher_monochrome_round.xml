@@ -1,21 +1,28 @@
 <vector android:height="108dp" android:viewportHeight="108"
     android:viewportWidth="108" android:width="108dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- woowtech logo: IΛIO top row, OIΛI bottom row (monochrome round) -->
+    <!-- Centered in 108dp canvas with safe zone (66dp usable area centered at 21,21) -->
     <group android:translateX="21" android:translateY="21">
-        <!-- Left vertical bar -->
-        <path android:fillColor="#000000" android:pathData="M8,12 L8,54 L12,54 L12,12 Z"/>
-        <!-- First A shape -->
-        <path android:fillColor="#000000" android:pathData="M14,12 L22,54 L26,54 L18,12 Z"/>
-        <path android:fillColor="#000000" android:pathData="M18,12 L26,54 L30,54 L22,12 Z"/>
-        <!-- Second vertical bar -->
-        <path android:fillColor="#000000" android:pathData="M24,12 L24,54 L28,54 L28,12 Z"/>
-        <!-- First O circle -->
-        <path android:fillColor="#000000" android:pathData="M38,12 A10,10 0 1,1 38,32 A10,10 0 1,1 38,12 M38,16 A6,6 0 1,0 38,28 A6,6 0 1,0 38,16"/>
-        <!-- Second O circle -->
-        <path android:fillColor="#000000" android:pathData="M16,34 A10,10 0 1,1 16,54 A10,10 0 1,0 16,34 M16,38 A6,6 0 1,0 16,50 A6,6 0 1,1 16,38"/>
-        <!-- Right inverted A -->
-        <path android:fillColor="#000000" android:pathData="M44,12 L52,54 L56,54 L48,12 Z"/>
-        <path android:fillColor="#000000" android:pathData="M48,12 L56,54 L60,54 L52,12 Z"/>
-        <!-- Right vertical bar -->
-        <path android:fillColor="#000000" android:pathData="M54,12 L54,54 L58,54 L58,12 Z"/>
+        <!-- ========== TOP ROW: I Λ I O ========== -->
+        <!-- I - left vertical bar -->
+        <path android:fillColor="#000000" android:pathData="M4,8 L4,30 L8,30 L8,8 Z"/>
+        <!-- Λ - Lambda (two diagonal lines meeting at top) -->
+        <path android:fillColor="#000000" android:pathData="M11,30 L17,8 L21,8 L15,30 Z"/>
+        <path android:fillColor="#000000" android:pathData="M15,30 L21,8 L25,8 L19,30 Z"/>
+        <!-- I - middle vertical bar -->
+        <path android:fillColor="#000000" android:pathData="M28,8 L28,30 L32,30 L32,8 Z"/>
+        <!-- O - hollow circle (top right) -->
+        <path android:fillColor="#000000" android:pathData="M46,8 A11,11 0 1,1 46,30 A11,11 0 1,1 46,8 M46,12 A7,7 0 1,0 46,26 A7,7 0 1,0 46,12" android:fillType="evenOdd"/>
+
+        <!-- ========== BOTTOM ROW: O I Λ I ========== -->
+        <!-- O - hollow circle (bottom left) -->
+        <path android:fillColor="#000000" android:pathData="M20,36 A11,11 0 1,1 20,58 A11,11 0 1,1 20,36 M20,40 A7,7 0 1,0 20,54 A7,7 0 1,0 20,40" android:fillType="evenOdd"/>
+        <!-- I - vertical bar -->
+        <path android:fillColor="#000000" android:pathData="M34,36 L34,58 L38,58 L38,36 Z"/>
+        <!-- Λ - Lambda (two diagonal lines meeting at top) -->
+        <path android:fillColor="#000000" android:pathData="M41,58 L47,36 L51,36 L45,58 Z"/>
+        <path android:fillColor="#000000" android:pathData="M45,58 L51,36 L55,36 L49,58 Z"/>
+        <!-- I - right vertical bar -->
+        <path android:fillColor="#000000" android:pathData="M58,36 L58,58 L62,58 L62,36 Z"/>
     </group>
 </vector>
