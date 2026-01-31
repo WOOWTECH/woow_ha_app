@@ -59,6 +59,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
@@ -291,7 +292,7 @@ private fun ServerItemContent(server: ServerDiscovered, onConnectClick: (URL) ->
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_home_assistant_branding),
+            painter = painterResource(R.drawable.ic_woowtech_branding),
             contentDescription = null,
             modifier = Modifier
                 .size(ICON_SIZE)
@@ -378,23 +379,15 @@ private fun AnimatedIcon() {
                 .align(Alignment.Center)
                 .rotate(rotation),
         )
-        Box(
+        Image(
+            painter = painterResource(R.drawable.ic_woowtech_branding),
+            contentDescription = null,
             modifier = Modifier
                 .size(80.dp)
                 .scale(pulse)
                 .align(Alignment.Center)
-                .background(HABrandColors.Blue, CircleShape),
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(commonR.drawable.ic_stat_ic_notification_blue),
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(HASize.X5L)
-                    .scale(pulse),
-                tint = HABrandColors.Background,
-            )
-        }
+                .clip(CircleShape),
+        )
     }
 }
 
