@@ -6,9 +6,9 @@ woowtech Home 是官方的 Android 智慧家庭控制應用程式。
 
 ## 下載
 
-[![下載 APK v1.0.1](https://img.shields.io/badge/下載-APK_v1.0.1-green?logo=android)](https://github.com/WOOWTECH/woow_ha_app/raw/releases/woowtech-home.apk)
+[![下載 APK v1.7.0](https://img.shields.io/badge/下載-APK_v1.7.0-green?logo=android)](https://github.com/WOOWTECH/woow_ha_app/raw/releases/woowtech-home-v1.7.0-debug.apk)
 
-**版本：** 1.0.1 | **更新日期：** 2026-01-30
+**版本：** 1.7.0 | **更新日期：** 2026-01-31
 
 ## 概述
 
