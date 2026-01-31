@@ -4,6 +4,10 @@
 
 The official woowtech Home Android companion app for smart home control.
 
+## Download
+
+[![Download APK](https://img.shields.io/github/v/release/WOOWTECH/woow_ha_app?label=Download%20APK&logo=android)](https://github.com/WOOWTECH/woow_ha_app/releases/latest)
+
 ## Overview
 
 woowtech Home is a mobile companion app that connects to your woowtech smart home server at `https://aiot.woowtech.io`. It provides local control and privacy-first smart home automation powered by Home Assistant open source technology.
