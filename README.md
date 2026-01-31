@@ -6,7 +6,9 @@ The official woowtech Home Android companion app for smart home control.
 
 ## Download
 
-[![Download APK](https://img.shields.io/badge/Download-APK-green?logo=android)](https://github.com/WOOWTECH/woow_ha_app/raw/releases/woowtech-home.apk)
+[![Download APK v1.0.1](https://img.shields.io/badge/Download-APK_v1.0.1-green?logo=android)](https://github.com/WOOWTECH/woow_ha_app/raw/releases/woowtech-home.apk)
+
+**Version:** 1.0.1 | **Updated:** 2026-01-30
 
 ## Overview
 
