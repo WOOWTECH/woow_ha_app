@@ -9,6 +9,12 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import io.homeassistant.companion.android.launch.HAStartDestinationRoute
+import io.homeassistant.companion.android.onboarding.cloudchooser.navigation.CloudChooserRoute
+import io.homeassistant.companion.android.onboarding.cloudchooser.navigation.cloudChooserScreen
+import io.homeassistant.companion.android.onboarding.cloudprovision.navigation.cloudProvisionScreen
+import io.homeassistant.companion.android.onboarding.cloudprovision.navigation.navigateToCloudProvision
+import io.homeassistant.companion.android.onboarding.cloudsignin.navigation.cloudSignInScreen
+import io.homeassistant.companion.android.onboarding.cloudsignin.navigation.navigateToCloudSignIn
 import io.homeassistant.companion.android.onboarding.connection.navigation.ConnectionRoute
 import io.homeassistant.companion.android.onboarding.connection.navigation.connectionScreen
 import io.homeassistant.companion.android.onboarding.connection.navigation.navigateToConnection
@@ -38,6 +44,7 @@ import io.homeassistant.companion.android.onboarding.wearmtls.navigation.URL_MTL
 import io.homeassistant.companion.android.onboarding.wearmtls.navigation.navigateToWearMTLS
 import io.homeassistant.companion.android.onboarding.wearmtls.navigation.wearMTLSScreen
 import io.homeassistant.companion.android.onboarding.welcome.navigation.WelcomeRoute
+import io.homeassistant.companion.android.onboarding.welcome.navigation.navigateToWelcome
 import io.homeassistant.companion.android.onboarding.welcome.navigation.welcomeScreen
 import io.homeassistant.companion.android.util.canGoBack
 import io.homeassistant.companion.android.util.compose.navigateToUri
@@ -117,12 +124,23 @@ internal fun NavGraphBuilder.onboarding(
     }
 
     val startDestination = when {
-        !skipWelcome -> WelcomeRoute
+        !skipWelcome -> CloudChooserRoute
         urlToOnboard.isNullOrEmpty() -> ServerDiscoveryRoute(serverDiscoveryMode)
         else -> ConnectionRoute(urlToOnboard)
     }
 
     navigation<OnboardingRoute>(startDestination = startDestination) {
+        cloudChooserScreen(
+            onLocalClick = { navController.navigateToWelcome() },
+            onCloudClick = { navController.navigateToCloudSignIn() },
+        )
+        cloudSignInScreen(
+            onBackClick = navController::popBackStack,
+            onSignInSuccess = { navController.navigateToCloudProvision() },
+        )
+        cloudProvisionScreen(
+            onBackClick = navController::popBackStack,
+        )
         welcomeScreen(
             onConnectClick = {
                 if (urlToOnboard.isNullOrEmpty()) {
