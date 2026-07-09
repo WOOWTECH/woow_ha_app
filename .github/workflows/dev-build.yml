@@ -1,0 +1,67 @@
+name: Dev Branch Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'dev/**'
+
+jobs:
+  debug_build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
+        with:
+          cache-disabled: true
+
+      - name: Mock google-services.json
+        run: |
+          cp .github/mock-google-services.json app/google-services.json
+          cp .github/mock-google-services.json wear/google-services.json
+          cp .github/mock-google-services.json automotive/google-services.json
+
+      - name: Build Full Debug APK
+        run: ./gradlew :app:assembleFullDebug
+
+      - name: Get branch name and version
+        id: info
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME//\//-}"
+          echo "branch=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+          echo "filename=woowtech-home-${BRANCH_NAME}-debug.apk" >> "$GITHUB_OUTPUT"
+
+      - name: Rename APK
+        run: |
+          APK_PATH=$(find app/build/outputs/apk/full/debug -name "*.apk" | head -1)
+          cp "$APK_PATH" "${{ steps.info.outputs.filename }}"
+
+      - name: Push APK to releases branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin releases
+          git checkout releases
+          cp "${{ github.workspace }}/${{ steps.info.outputs.filename }}" .
+          git add "${{ steps.info.outputs.filename }}"
+          git commit -m "${{ steps.info.outputs.branch }}: dev build $(date -u +%Y-%m-%d)"
+          git push origin releases
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: debug-apk
+          path: ${{ steps.info.outputs.filename }}
