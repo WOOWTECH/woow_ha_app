@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 // and poll /status when integrating the actual cloud provisioning backend.
 // This entire mock (delay + hardcoded URL) should be replaced with the real
 // provisioning flow at that point.
-internal const val MOCK_TEST_SERVER_URL = "https://woowtechdemo-ha1.woowtech.io"
+internal const val MOCK_TEST_SERVER_URL = "https://woowtech-ha.woowtech.io"
 
 @HiltViewModel
 internal class CloudProvisionViewModel @Inject constructor() : ViewModel() {
