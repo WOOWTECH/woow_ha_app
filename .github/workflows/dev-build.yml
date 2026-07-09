@@ -51,12 +51,14 @@ jobs:
 
       - name: Push APK to releases branch
         run: |
+          APK_FILE="${{ steps.info.outputs.filename }}"
+          cp "$APK_FILE" /tmp/"$APK_FILE"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin releases
           git checkout releases
-          cp "${{ github.workspace }}/${{ steps.info.outputs.filename }}" .
-          git add "${{ steps.info.outputs.filename }}"
+          cp /tmp/"$APK_FILE" .
+          git add "$APK_FILE"
           git commit -m "${{ steps.info.outputs.branch }}: dev build $(date -u +%Y-%m-%d)"
           git push origin releases
 
