@@ -1,0 +1,92 @@
+<h2>Cloud Onboarding 導航流程</h2>
+<p class="subtitle">新畫面要插入到 onboarding 流程的哪個位置？請確認這個流程是否正確</p>
+
+<div class="section">
+  <h3>目前的 Onboarding 流程</h3>
+  <div class="mockup">
+    <div class="mockup-header">現有流程 (不修改)</div>
+    <div class="mockup-body" style="text-align:center; padding:24px;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
+        <div style="background:#2563eb; color:white; padding:12px 20px; border-radius:8px; font-weight:600;">Welcome</div>
+        <span style="font-size:24px; color:#666;">→</span>
+        <div style="background:#2563eb; color:white; padding:12px 20px; border-radius:8px; font-weight:600;">ServerDiscovery</div>
+        <span style="font-size:24px; color:#666;">→</span>
+        <div style="background:#2563eb; color:white; padding:12px 20px; border-radius:8px; font-weight:600;">Connection/OAuth</div>
+        <span style="font-size:24px; color:#666;">→</span>
+        <div style="background:#2563eb; color:white; padding:12px 20px; border-radius:8px; font-weight:600;">DeviceNaming</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>新增 Cloud Onboarding 後的流程</h3>
+  <div class="mockup">
+    <div class="mockup-header">提案：在 Welcome 之前插入 CloudChooser</div>
+    <div class="mockup-body" style="text-align:center; padding:24px;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
+        <div style="background:#f59e0b; color:white; padding:12px 16px; border-radius:8px; font-weight:600; border:3px solid #d97706;">CloudChooser<br><small>本地 / 雲端</small></div>
+        <span style="font-size:20px; color:#666;">→</span>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="background:#16a34a; color:white; padding:8px 12px; border-radius:6px; font-size:13px;">選「本地」</div>
+            <span style="color:#666;">→</span>
+            <div style="background:#2563eb; color:white; padding:8px 12px; border-radius:6px; font-size:13px;">Welcome → ServerDiscovery → ...</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="background:#dc2626; color:white; padding:8px 12px; border-radius:6px; font-size:13px;">選「雲端」</div>
+            <span style="color:#666;">→</span>
+            <div style="background:#f59e0b; color:white; padding:8px 12px; border-radius:6px; font-size:13px; border:2px solid #d97706;">CloudSignIn</div>
+            <span style="color:#666;">→</span>
+            <div style="background:#f59e0b; color:white; padding:8px 12px; border-radius:6px; font-size:13px; border:2px solid #d97706;">CloudProvision</div>
+            <span style="color:#666;">→</span>
+            <div style="background:#2563eb; color:white; padding:8px 12px; border-radius:6px; font-size:13px;">OAuth (skipWelcome=true)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>插入策略選擇</h3>
+<p class="subtitle">CloudChooser 要怎麼插入現有的 navigation graph？</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>方案 A：替換 startDestination</h3>
+      <p>在 <code>OnboardingNavigation.kt</code> 的 <code>onboarding()</code> 函式裡，把 <code>startDestination</code> 從 <code>WelcomeRoute</code> 改成 <code>CloudChooserRoute</code>（當 <code>!skipWelcome</code> 時）。CloudChooser 選「本地」後 navigate 到 WelcomeRoute，選「雲端」navigate 到 CloudSignInRoute。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>優點</h4><ul><li>改動最少，只動一行 startDestination + 新增 3 個畫面</li><li>完全不動 Welcome/ServerDiscovery 既有邏輯</li></ul></div>
+        <div class="cons"><h4>缺點</h4><ul><li>CloudChooser 變成同一個 nav graph 裡的 startDestination，語義上稍微不直覺（它不是真正的 "onboarding" 第一步，而是一個前置選擇）</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>方案 B：在 LaunchViewModel 層做分流</h3>
+      <p>不動 <code>OnboardingNavigation.kt</code> 的 startDestination。改在 <code>LaunchViewModel.navigateToOnboarding()</code> 之前，先 emit 一個新的 <code>CloudChooserRoute</code>。選「本地」後才呼叫原本的 <code>navigateToOnboarding()</code>。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>優點</h4><ul><li>onboarding 的 nav graph 完全不變</li><li>CloudChooser 在概念上是 onboarding 之前的獨立步驟</li></ul></div>
+        <div class="cons"><h4>缺點</h4><ul><li>需要改 LaunchViewModel 和 HANavHost，動到更高層的檔案</li><li>任務規格說「不要動既有的本地流程」，改 LaunchViewModel 有觸碰範圍邊界的風險</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>方案 C：嵌套 navigation graph</h3>
+      <p>建一個新的 <code>cloudOnboarding</code> nested nav graph，包含 CloudChooser → CloudSignIn → CloudProvision 三個畫面。在 <code>onboarding()</code> 裡把它註冊為一個子圖，startDestination 指向這個子圖。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>優點</h4><ul><li>三個新畫面的 navigation 完全封裝在自己的子圖裡</li><li>未來擴充（加步驟）很乾淨</li></ul></div>
+        <div class="cons"><h4>缺點</h4><ul><li>增加架構複雜度，目前只有 3 個畫面可能 over-engineering</li><li>跨子圖 navigate 到 WelcomeRoute 需要額外處理</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top:24px; color:#888; font-style:italic;">我推薦方案 A — 改動最小、風險最低、完全遵守「不動既有流程」的原則。點選你偏好的方案。</p>

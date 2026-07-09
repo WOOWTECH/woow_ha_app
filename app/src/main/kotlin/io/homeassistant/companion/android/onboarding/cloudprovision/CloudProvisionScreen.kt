@@ -95,7 +95,7 @@ private fun CloudProvisionContent(
                         imageVector = Icons.Default.Cloud,
                         contentDescription = null,
                         modifier = Modifier.size(80.dp),
-                        tint = LocalHAColorScheme.current.colorAccentPrimary,
+                        tint = LocalHAColorScheme.current.colorFillPrimaryNormalResting,
                     )
                     Text(
                         text = "開通雲端服務",
@@ -118,7 +118,7 @@ private fun CloudProvisionContent(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(80.dp),
-                        tint = LocalHAColorScheme.current.colorAccentPrimary,
+                        tint = LocalHAColorScheme.current.colorFillPrimaryNormalResting,
                     )
                     Text(
                         text = "開通完成！正在連線...",

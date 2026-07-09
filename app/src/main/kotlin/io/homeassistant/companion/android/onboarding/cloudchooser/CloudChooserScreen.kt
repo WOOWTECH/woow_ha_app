@@ -103,7 +103,7 @@ private fun ChooserCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        color = LocalHAColorScheme.current.colorSurfaceVariant,
+        color = LocalHAColorScheme.current.colorSurfaceLow,
         tonalElevation = 2.dp,
     ) {
         Row(
