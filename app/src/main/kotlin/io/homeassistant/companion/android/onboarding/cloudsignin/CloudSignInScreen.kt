@@ -24,6 +24,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -51,6 +54,7 @@ internal fun CloudSignInScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var hasNavigated by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (uiState is DeviceFlowUiState.Idle) {
@@ -59,7 +63,8 @@ internal fun CloudSignInScreen(
     }
 
     LaunchedEffect(uiState) {
-        if (uiState is DeviceFlowUiState.Authorized) {
+        if (uiState is DeviceFlowUiState.Authorized && !hasNavigated) {
+            hasNavigated = true
             onAuthorized((uiState as DeviceFlowUiState.Authorized).accessToken)
         }
     }

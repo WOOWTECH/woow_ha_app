@@ -21,11 +21,14 @@ internal class CloudSignInViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     private var pollJob: Job? = null
+    private var deviceFlowJob: Job? = null
     private var currentDeviceCode: String? = null
     private var currentInterval: Int = 5
 
     fun startDeviceFlow() {
-        viewModelScope.launch {
+        deviceFlowJob?.cancel()
+        pollJob?.cancel()
+        deviceFlowJob = viewModelScope.launch {
             try {
                 _uiState.value = DeviceFlowUiState.RequestingCode
 

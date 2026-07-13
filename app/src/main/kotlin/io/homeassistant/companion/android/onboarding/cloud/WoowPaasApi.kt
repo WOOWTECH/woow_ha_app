@@ -1,11 +1,15 @@
 package io.homeassistant.companion.android.onboarding.cloud
 
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONException
 import org.json.JSONObject
 
 internal data class DeviceCodeResponse(
@@ -44,9 +48,29 @@ internal data class StatusResponse(
     val error: String? = null,
 )
 
+@Singleton
 internal class WoowPaasApi @Inject constructor() {
 
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(15, TimeUnit.SECONDS)
+        .callTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    private fun Response.parseJsonBody(): JSONObject {
+        val bodyString = body?.string() ?: throw ApiException(code, "伺服器回應為空")
+        return try {
+            JSONObject(bodyString)
+        } catch (e: JSONException) {
+            throw ApiException(code, "伺服器回應格式錯誤 (HTTP $code)")
+        }
+    }
+
+    private fun JSONObject.nullableString(key: String): String? {
+        val value = optString(key, "")
+        return if (value.isEmpty() || value == "null") null else value
+    }
 
     suspend fun requestDeviceCode(): Result<DeviceCodeResponse> = withContext(Dispatchers.IO) {
         runCatching {
@@ -60,21 +84,22 @@ internal class WoowPaasApi @Inject constructor() {
                 .post(body)
                 .build()
 
-            val response = client.newCall(request).execute()
-            val json = JSONObject(response.body!!.string())
+            client.newCall(request).execute().use { response ->
+                val json = response.parseJsonBody()
 
-            if (!response.isSuccessful) {
-                throw ApiException(response.code, json.optString("error", "unknown_error"))
+                if (!response.isSuccessful) {
+                    throw ApiException(response.code, json.nullableString("error") ?: "unknown_error")
+                }
+
+                DeviceCodeResponse(
+                    deviceCode = json.getString("device_code"),
+                    userCode = json.getString("user_code"),
+                    verificationUri = json.getString("verification_uri"),
+                    verificationUriComplete = json.getString("verification_uri_complete"),
+                    expiresIn = json.getInt("expires_in"),
+                    interval = json.getInt("interval"),
+                )
             }
-
-            DeviceCodeResponse(
-                deviceCode = json.getString("device_code"),
-                userCode = json.getString("user_code"),
-                verificationUri = json.getString("verification_uri"),
-                verificationUriComplete = json.getString("verification_uri_complete"),
-                expiresIn = json.getInt("expires_in"),
-                interval = json.getInt("interval"),
-            )
         }
     }
 
@@ -92,26 +117,29 @@ internal class WoowPaasApi @Inject constructor() {
                     .post(body)
                     .build()
 
-                val response = client.newCall(request).execute()
-                val json = JSONObject(response.body!!.string())
+                client.newCall(request).execute().use { response ->
+                    val json = response.parseJsonBody()
 
-                if (response.isSuccessful) {
-                    TokenPollResult.Success(
-                        TokenResponse(
-                            accessToken = json.getString("access_token"),
-                            tokenType = json.getString("token_type"),
-                            expiresIn = json.getInt("expires_in"),
-                            scope = json.getString("scope"),
-                            refreshToken = json.optString("refresh_token", null),
-                        ),
-                    )
-                } else {
-                    when (json.optString("error")) {
-                        "authorization_pending" -> TokenPollResult.Pending
-                        "slow_down" -> TokenPollResult.SlowDown(currentInterval + 5)
-                        else -> TokenPollResult.Failed(
-                            json.optString("error_description", json.optString("error", "授權失敗")),
+                    if (response.isSuccessful) {
+                        TokenPollResult.Success(
+                            TokenResponse(
+                                accessToken = json.getString("access_token"),
+                                tokenType = json.getString("token_type"),
+                                expiresIn = json.getInt("expires_in"),
+                                scope = json.getString("scope"),
+                                refreshToken = json.nullableString("refresh_token"),
+                            ),
                         )
+                    } else {
+                        when (json.nullableString("error")) {
+                            "authorization_pending" -> TokenPollResult.Pending
+                            "slow_down" -> TokenPollResult.SlowDown(currentInterval + 5)
+                            else -> TokenPollResult.Failed(
+                                json.nullableString("error_description")
+                                    ?: json.nullableString("error")
+                                    ?: "授權失敗",
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -128,22 +156,23 @@ internal class WoowPaasApi @Inject constructor() {
                     .addHeader("Authorization", "Bearer $accessToken")
                     .build()
 
-                val response = client.newCall(request).execute()
-                val json = JSONObject(response.body!!.string())
+                client.newCall(request).execute().use { response ->
+                    val json = response.parseJsonBody()
 
-                when (response.code) {
-                    200, 202 -> ProvisionResponse(
-                        status = json.getString("status"),
-                        haUrl = json.optString("ha_url", null),
-                    )
-                    409 -> ProvisionResponse(
-                        status = json.getString("status"),
-                        error = json.optString("error", null),
-                    )
-                    401 -> throw ApiException(401, "登入已過期，請返回重新登入")
-                    403 -> throw ApiException(403, "權限不足（缺少 ha:provision scope）")
-                    503 -> throw ApiException(503, "服務尚未開放，請稍後再試")
-                    else -> throw ApiException(response.code, json.optString("error", "未知錯誤"))
+                    when (response.code) {
+                        200, 202 -> ProvisionResponse(
+                            status = json.getString("status"),
+                            haUrl = json.nullableString("ha_url"),
+                        )
+                        409 -> ProvisionResponse(
+                            status = json.getString("status"),
+                            error = json.nullableString("error"),
+                        )
+                        401 -> throw ApiException(401, "登入已過期，請返回重新登入")
+                        403 -> throw ApiException(403, "權限不足（缺少 ha:provision scope）")
+                        503 -> throw ApiException(503, "服務尚未開放，請稍後再試")
+                        else -> throw ApiException(response.code, json.nullableString("error") ?: "未知錯誤 (HTTP ${response.code})")
+                    }
                 }
             }
         }
@@ -157,18 +186,19 @@ internal class WoowPaasApi @Inject constructor() {
                     .addHeader("Authorization", "Bearer $accessToken")
                     .build()
 
-                val response = client.newCall(request).execute()
-                val json = JSONObject(response.body!!.string())
+                client.newCall(request).execute().use { response ->
+                    val json = response.parseJsonBody()
 
-                if (!response.isSuccessful) {
-                    throw ApiException(response.code, json.optString("error", "查詢狀態失敗"))
+                    if (!response.isSuccessful) {
+                        throw ApiException(response.code, json.nullableString("error") ?: "查詢狀態失敗 (HTTP ${response.code})")
+                    }
+
+                    StatusResponse(
+                        status = json.getString("status"),
+                        haUrl = json.nullableString("ha_url"),
+                        error = json.nullableString("error"),
+                    )
                 }
-
-                StatusResponse(
-                    status = json.getString("status"),
-                    haUrl = json.optString("ha_url", null),
-                    error = json.optString("error", null),
-                )
             }
         }
 }

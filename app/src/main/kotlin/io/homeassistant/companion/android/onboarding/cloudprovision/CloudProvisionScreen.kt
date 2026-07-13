@@ -23,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,14 +45,21 @@ import io.homeassistant.companion.android.util.compose.HAPreviews
 @Composable
 internal fun CloudProvisionScreen(
     viewModel: CloudProvisionViewModel,
+    sharedState: io.homeassistant.companion.android.onboarding.cloud.CloudOnboardingState,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var hasLaunched by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.setAccessToken(sharedState)
+    }
 
     LaunchedEffect(uiState) {
-        if (uiState is ProvisionUiState.Ready) {
+        if (uiState is ProvisionUiState.Ready && !hasLaunched) {
+            hasLaunched = true
             context.startLaunchOnboarding(
                 urlToOnboard = (uiState as ProvisionUiState.Ready).serverUrl,
                 hideExistingServers = false,
