@@ -26,26 +26,33 @@ internal class CloudSignInViewModel @Inject constructor(
 
     fun startDeviceFlow() {
         viewModelScope.launch {
-            _uiState.value = DeviceFlowUiState.RequestingCode
+            try {
+                _uiState.value = DeviceFlowUiState.RequestingCode
 
-            api.requestDeviceCode().fold(
-                onSuccess = { response ->
-                    currentDeviceCode = response.deviceCode
-                    currentInterval = response.interval
-                    _uiState.value = DeviceFlowUiState.WaitingForAuth(
-                        userCode = response.userCode,
-                        verificationUri = response.verificationUri,
-                        verificationUriComplete = response.verificationUriComplete,
-                    )
-                    startPolling()
-                },
-                onFailure = { error ->
-                    _uiState.value = DeviceFlowUiState.Error(
-                        message = error.message ?: "無法取得驗證碼",
-                        canRetry = true,
-                    )
-                },
-            )
+                api.requestDeviceCode().fold(
+                    onSuccess = { response ->
+                        currentDeviceCode = response.deviceCode
+                        currentInterval = response.interval
+                        _uiState.value = DeviceFlowUiState.WaitingForAuth(
+                            userCode = response.userCode,
+                            verificationUri = response.verificationUri,
+                            verificationUriComplete = response.verificationUriComplete,
+                        )
+                        startPolling()
+                    },
+                    onFailure = { error ->
+                        _uiState.value = DeviceFlowUiState.Error(
+                            message = error.message ?: "無法取得驗證碼",
+                            canRetry = true,
+                        )
+                    },
+                )
+            } catch (e: Exception) {
+                _uiState.value = DeviceFlowUiState.Error(
+                    message = "連線失敗: ${e.message}",
+                    canRetry = true,
+                )
+            }
         }
     }
 
