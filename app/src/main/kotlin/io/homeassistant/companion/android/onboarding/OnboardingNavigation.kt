@@ -136,7 +136,7 @@ internal fun NavGraphBuilder.onboarding(
         )
         cloudSignInScreen(
             onBackClick = navController::popBackStack,
-            onSignInSuccess = { navController.navigateToCloudProvision() },
+            onAuthorized = { accessToken -> navController.navigateToCloudProvision(accessToken) },
         )
         cloudProvisionScreen(
             onBackClick = navController::popBackStack,

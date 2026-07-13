@@ -17,13 +17,13 @@ internal fun NavController.navigateToCloudSignIn(navOptions: NavOptions? = null)
 
 internal fun NavGraphBuilder.cloudSignInScreen(
     onBackClick: () -> Unit,
-    onSignInSuccess: () -> Unit,
+    onAuthorized: (accessToken: String) -> Unit,
 ) {
     composable<CloudSignInRoute> {
         CloudSignInScreen(
             viewModel = hiltViewModel(),
             onBackClick = onBackClick,
-            onSignInSuccess = onSignInSuccess,
+            onAuthorized = onAuthorized,
         )
     }
 }

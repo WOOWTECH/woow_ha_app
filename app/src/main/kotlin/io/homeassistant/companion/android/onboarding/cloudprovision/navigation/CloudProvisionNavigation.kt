@@ -9,10 +9,10 @@ import io.homeassistant.companion.android.onboarding.cloudprovision.CloudProvisi
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data object CloudProvisionRoute
+internal data class CloudProvisionRoute(val accessToken: String)
 
-internal fun NavController.navigateToCloudProvision(navOptions: NavOptions? = null) {
-    navigate(route = CloudProvisionRoute, navOptions)
+internal fun NavController.navigateToCloudProvision(accessToken: String, navOptions: NavOptions? = null) {
+    navigate(route = CloudProvisionRoute(accessToken), navOptions)
 }
 
 internal fun NavGraphBuilder.cloudProvisionScreen(

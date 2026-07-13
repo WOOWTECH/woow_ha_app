@@ -1,5 +1,7 @@
 package io.homeassistant.companion.android.onboarding.cloudsignin
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,66 +12,57 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.homeassistant.companion.android.common.compose.composable.HAAccentButton
-import io.homeassistant.companion.android.common.compose.composable.HATextField
+import io.homeassistant.companion.android.common.compose.composable.HAPlainButton
 import io.homeassistant.companion.android.common.compose.composable.HATopBar
 import io.homeassistant.companion.android.common.compose.theme.HADimens
 import io.homeassistant.companion.android.common.compose.theme.HATextStyle
 import io.homeassistant.companion.android.common.compose.theme.HAThemeForPreview
+import io.homeassistant.companion.android.common.compose.theme.LocalHAColorScheme
 import io.homeassistant.companion.android.util.compose.HAPreviews
 
 @Composable
 internal fun CloudSignInScreen(
     viewModel: CloudSignInViewModel,
     onBackClick: () -> Unit,
-    onSignInSuccess: () -> Unit,
+    onAuthorized: (accessToken: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(uiState) {
-        if (uiState is SignInUiState.Success) {
-            onSignInSuccess()
+    LaunchedEffect(Unit) {
+        if (uiState is DeviceFlowUiState.Idle) {
+            viewModel.startDeviceFlow()
         }
     }
 
-    CloudSignInContent(
-        uiState = uiState,
-        onBackClick = onBackClick,
-        onSignInClick = viewModel::onSignInClick,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun CloudSignInContent(
-    uiState: SignInUiState,
-    onBackClick: () -> Unit,
-    onSignInClick: (email: String, password: String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    val isLoading = uiState is SignInUiState.Loading
+    LaunchedEffect(uiState) {
+        if (uiState is DeviceFlowUiState.Authorized) {
+            onAuthorized((uiState as DeviceFlowUiState.Authorized).accessToken)
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -85,75 +78,155 @@ private fun CloudSignInContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(HADimens.SPACE6),
         ) {
-            Text(
-                text = "雲端登入",
-                style = HATextStyle.Headline,
-                modifier = Modifier.padding(top = HADimens.SPACE6),
-            )
+            Spacer(modifier = Modifier.weight(0.2f))
 
-            Text(
-                text = "使用您的 Woow 帳號登入或註冊",
-                style = HATextStyle.Body,
-            )
+            when (val state = uiState) {
+                is DeviceFlowUiState.Idle,
+                is DeviceFlowUiState.RequestingCode,
+                -> {
+                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                    Text(
+                        text = "正在準備驗證...",
+                        style = HATextStyle.Body,
+                    )
+                }
 
-            HATextField(
-                value = email,
-                onValueChange = { email = it },
-                placeholder = { Text("Email", style = HATextStyle.UserInput) },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next,
-                ),
-                maxLines = 1,
-                modifier = Modifier.fillMaxWidth(),
-            )
+                is DeviceFlowUiState.WaitingForAuth -> {
+                    WaitingForAuthContent(
+                        userCode = state.userCode,
+                        verificationUriComplete = state.verificationUriComplete,
+                    )
+                }
 
-            HATextField(
-                value = password,
-                onValueChange = { password = it },
-                placeholder = { Text("密碼", style = HATextStyle.UserInput) },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (email.isNotEmpty() && password.isNotEmpty() && !isLoading) {
-                            onSignInClick(email, password)
-                        }
-                    },
-                ),
-                maxLines = 1,
-                modifier = Modifier.fillMaxWidth(),
-            )
+                is DeviceFlowUiState.Authorized -> {
+                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                    Text(
+                        text = "授權成功！正在前往開通...",
+                        style = HATextStyle.Body,
+                    )
+                }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                is DeviceFlowUiState.Error -> {
+                    ErrorContent(
+                        message = state.message,
+                        canRetry = state.canRetry,
+                        onRetry = { viewModel.startDeviceFlow() },
+                    )
+                }
             }
 
-            HAAccentButton(
-                text = "登入 / 註冊",
-                onClick = { onSignInClick(email, password) },
-                enabled = email.isNotEmpty() && password.isNotEmpty() && !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = HADimens.SPACE6),
-            )
+            Spacer(modifier = Modifier.weight(0.8f))
         }
+    }
+}
+
+@Composable
+private fun WaitingForAuthContent(
+    userCode: String,
+    verificationUriComplete: String,
+) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+
+    Text(
+        text = "雲端登入",
+        style = HATextStyle.Headline,
+    )
+
+    Text(
+        text = "請在瀏覽器中輸入以下驗證碼完成登入",
+        style = HATextStyle.Body,
+        textAlign = TextAlign.Center,
+    )
+
+    Text(
+        text = userCode,
+        style = HATextStyle.Headline.copy(
+            fontSize = 36.sp,
+            fontFamily = FontFamily.Monospace,
+            letterSpacing = 4.sp,
+        ),
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(vertical = HADimens.SPACE4),
+    )
+
+    IconButton(
+        onClick = { clipboardManager.setText(AnnotatedString(userCode)) },
+    ) {
+        Icon(
+            imageVector = Icons.Default.ContentCopy,
+            contentDescription = "複製驗證碼",
+        )
+    }
+
+    CircularProgressIndicator(modifier = Modifier.size(32.dp))
+
+    Text(
+        text = "等待瀏覽器授權中...",
+        style = HATextStyle.Body,
+        color = LocalHAColorScheme.current.colorTextSecondary,
+    )
+
+    HAAccentButton(
+        text = "前往驗證",
+        onClick = {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(verificationUriComplete))
+            context.startActivity(intent)
+        },
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun ErrorContent(
+    message: String,
+    canRetry: Boolean,
+    onRetry: () -> Unit,
+) {
+    Icon(
+        imageVector = Icons.Default.ErrorOutline,
+        contentDescription = null,
+        modifier = Modifier.size(64.dp),
+        tint = LocalHAColorScheme.current.colorFillDangerNormalResting,
+    )
+
+    Text(
+        text = message,
+        style = HATextStyle.Body,
+        textAlign = TextAlign.Center,
+    )
+
+    if (canRetry) {
+        HAPlainButton(
+            text = "重新開始",
+            onClick = onRetry,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
 @HAPreviews
 @Composable
-private fun CloudSignInScreenPreview() {
+private fun CloudSignInWaitingPreview() {
     HAThemeForPreview {
-        CloudSignInContent(
-            uiState = SignInUiState.Idle,
-            onBackClick = {},
-            onSignInClick = { _, _ -> },
-        )
+        Scaffold(
+            topBar = { HATopBar(onBackClick = {}) },
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = HADimens.SPACE4),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(HADimens.SPACE6),
+            ) {
+                Spacer(modifier = Modifier.weight(0.2f))
+                WaitingForAuthContent(
+                    userCode = "ABCD-1234",
+                    verificationUriComplete = "https://stg.woowtech.io/device?user_code=ABCD-1234",
+                )
+                Spacer(modifier = Modifier.weight(0.8f))
+            }
+        }
     }
 }

@@ -14,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -24,9 +26,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.homeassistant.companion.android.common.compose.composable.HAAccentButton
+import io.homeassistant.companion.android.common.compose.composable.HAPlainButton
 import io.homeassistant.companion.android.common.compose.composable.HATopBar
 import io.homeassistant.companion.android.common.compose.theme.HADimens
 import io.homeassistant.companion.android.common.compose.theme.HATextStyle
@@ -72,7 +76,7 @@ private fun CloudProvisionContent(
     Scaffold(
         modifier = modifier,
         topBar = {
-            if (uiState is ProvisionUiState.Idle) {
+            if (uiState is ProvisionUiState.Idle || uiState is ProvisionUiState.Error) {
                 HATopBar(onBackClick = onBackClick)
             }
         },
@@ -125,18 +129,87 @@ private fun CloudProvisionContent(
                         style = HATextStyle.Headline,
                     )
                 }
+                is ProvisionUiState.Error -> {
+                    Icon(
+                        imageVector = Icons.Default.ErrorOutline,
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp),
+                        tint = LocalHAColorScheme.current.colorFillDangerNormalResting,
+                    )
+                    Text(
+                        text = uiState.message,
+                        style = HATextStyle.Body,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                is ProvisionUiState.Suspended -> {
+                    Icon(
+                        imageVector = Icons.Default.Pause,
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp),
+                        tint = LocalHAColorScheme.current.colorFillWarningNormalResting,
+                    )
+                    Text(
+                        text = "服務已暫停",
+                        style = HATextStyle.Headline,
+                    )
+                    Text(
+                        text = "您的 Woow HA 服務已被暫停，請聯繫支援",
+                        style = HATextStyle.Body,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                is ProvisionUiState.Deleting -> {
+                    CircularProgressIndicator(modifier = Modifier.size(64.dp))
+                    Text(
+                        text = "前一個服務正在刪除中",
+                        style = HATextStyle.Headline,
+                    )
+                    Text(
+                        text = "請稍後重新開通",
+                        style = HATextStyle.Body,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.weight(0.7f))
 
-            if (uiState is ProvisionUiState.Idle) {
-                HAAccentButton(
-                    text = "開啟 Woow HA 服務",
-                    onClick = onProvisionClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = HADimens.SPACE6),
-                )
+            when (uiState) {
+                is ProvisionUiState.Idle -> {
+                    HAAccentButton(
+                        text = "開啟 Woow HA 服務",
+                        onClick = onProvisionClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = HADimens.SPACE6),
+                    )
+                }
+                is ProvisionUiState.Error -> {
+                    if (uiState.canRetry) {
+                        HAAccentButton(
+                            text = "重試",
+                            onClick = onProvisionClick,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    HAPlainButton(
+                        text = "返回",
+                        onClick = onBackClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = HADimens.SPACE6),
+                    )
+                }
+                is ProvisionUiState.Deleting -> {
+                    HAAccentButton(
+                        text = "重試",
+                        onClick = onProvisionClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = HADimens.SPACE6),
+                    )
+                }
+                else -> {}
             }
         }
     }
@@ -156,10 +229,10 @@ private fun CloudProvisionScreenIdlePreview() {
 
 @HAPreviews
 @Composable
-private fun CloudProvisionScreenProvisioningPreview() {
+private fun CloudProvisionScreenErrorPreview() {
     HAThemeForPreview {
         CloudProvisionContent(
-            uiState = ProvisionUiState.Provisioning,
+            uiState = ProvisionUiState.Error(message = "服務尚未開放，請稍後再試", canRetry = true),
             onBackClick = {},
             onProvisionClick = {},
         )
