@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-internal class CloudSignInViewModel @Inject constructor(
-    private val api: WoowPaasApi,
-) : ViewModel() {
+internal class CloudSignInViewModel @Inject constructor() : ViewModel() {
+
+    private val api = WoowPaasApi()
 
     private val _uiState = MutableStateFlow<DeviceFlowUiState>(DeviceFlowUiState.Idle)
     val uiState = _uiState.asStateFlow()

@@ -1,8 +1,6 @@
 package io.homeassistant.companion.android.onboarding.cloud
 
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -48,8 +46,7 @@ internal data class StatusResponse(
     val error: String? = null,
 )
 
-@Singleton
-internal class WoowPaasApi @Inject constructor() {
+internal class WoowPaasApi {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)

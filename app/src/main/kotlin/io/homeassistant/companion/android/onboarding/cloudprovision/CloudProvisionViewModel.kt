@@ -18,9 +18,9 @@ private const val MAX_POLL_INTERVAL_MS = 30_000L
 private const val POLL_TIMEOUT_MS = 10 * 60 * 1000L // 10 minutes
 
 @HiltViewModel
-internal class CloudProvisionViewModel @Inject constructor(
-    private val api: WoowPaasApi,
-) : ViewModel() {
+internal class CloudProvisionViewModel @Inject constructor() : ViewModel() {
+
+    private val api = WoowPaasApi()
 
     private var accessToken: String? = null
 
