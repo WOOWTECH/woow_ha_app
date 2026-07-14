@@ -253,8 +253,15 @@ internal class WoowPaasApi {
         }
     }
 
+    /**
+     * Queries the provisioning status of the caller's Home Assistant instance.
+     *
+     * Unlike a plain `runCatching`, a [CancellationException] is re-thrown rather than captured into a
+     * failed [Result]: this method is called from a polling loop, and swallowing cancellation would
+     * turn a cancelled poll into a spurious failure.
+     */
     suspend fun getStatus(accessToken: String): Result<StatusResponse> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val request = Request.Builder()
                 .url("${WoowPaasConfig.BASE_URL}/api/ha-paas/status")
                 .get()
@@ -271,12 +278,18 @@ internal class WoowPaasApi {
                     )
                 }
 
-                StatusResponse(
-                    status = json.getString("status"),
-                    haUrl = json.nullableString("ha_url"),
-                    error = json.nullableString("error"),
+                Result.success(
+                    StatusResponse(
+                        status = json.getString("status"),
+                        haUrl = json.nullableString("ha_url"),
+                        error = json.nullableString("error"),
+                    ),
                 )
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }
