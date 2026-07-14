@@ -6,16 +6,32 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.homeassistant.companion.android.onboarding.cloud.TokenPollResult
 import io.homeassistant.companion.android.onboarding.cloud.WoowPaasApi
 import javax.inject.Inject
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-@HiltViewModel
-internal class CloudSignInViewModel @Inject constructor() : ViewModel() {
+private const val DEFAULT_POLL_INTERVAL_SECONDS = 5
+private const val MAX_POLL_BACKOFF_SECONDS = 60
 
-    private val api = WoowPaasApi()
+@OptIn(ExperimentalTime::class)
+@HiltViewModel
+internal class CloudSignInViewModel internal constructor(private val api: WoowPaasApi, private val clock: Clock) :
+    ViewModel() {
+
+    /**
+     * Production constructor used by Hilt. [WoowPaasApi] is created directly (never injected) to keep its
+     * lazily-built [okhttp3.OkHttpClient] off the main thread, while [Clock] is provided by Hilt. The primary
+     * constructor exposes both dependencies so unit tests can supply fakes without going through Hilt.
+     */
+    @Inject
+    constructor(clock: Clock) : this(api = WoowPaasApi(), clock = clock)
 
     private val _uiState = MutableStateFlow<DeviceFlowUiState>(DeviceFlowUiState.Idle)
     val uiState = _uiState.asStateFlow()
@@ -23,7 +39,13 @@ internal class CloudSignInViewModel @Inject constructor() : ViewModel() {
     private var pollJob: Job? = null
     private var deviceFlowJob: Job? = null
     private var currentDeviceCode: String? = null
-    private var currentInterval: Int = 5
+    private var currentInterval: Int = DEFAULT_POLL_INTERVAL_SECONDS
+
+    // The last "waiting" state, reused to toggle the reconnecting hint without losing the user code.
+    private var waitingState: DeviceFlowUiState.WaitingForAuth? = null
+
+    // Client-side upper bound: once the device code has expired we stop even if the server is unreachable.
+    private var pollDeadline: Instant? = null
 
     fun startDeviceFlow() {
         deviceFlowJob?.cancel()
@@ -36,11 +58,14 @@ internal class CloudSignInViewModel @Inject constructor() : ViewModel() {
                     onSuccess = { response ->
                         currentDeviceCode = response.deviceCode
                         currentInterval = response.interval
-                        _uiState.value = DeviceFlowUiState.WaitingForAuth(
+                        pollDeadline = clock.now() + response.expiresIn.seconds
+                        val waiting = DeviceFlowUiState.WaitingForAuth(
                             userCode = response.userCode,
                             verificationUri = response.verificationUri,
                             verificationUriComplete = response.verificationUriComplete,
                         )
+                        waitingState = waiting
+                        _uiState.value = waiting
                         startPolling()
                     },
                     onFailure = { error ->
@@ -50,6 +75,8 @@ internal class CloudSignInViewModel @Inject constructor() : ViewModel() {
                         )
                     },
                 )
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _uiState.value = DeviceFlowUiState.Error(
                     message = "連線失敗: ${e.message}",
@@ -59,13 +86,20 @@ internal class CloudSignInViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Polls the token endpoint until the user authorizes, the device code expires or a terminal error occurs.
+     *
+     * Transient failures (network hiccups, HTTP 5xx) do not abort the flow: the loop keeps polling with an
+     * exponential backoff and surfaces a "reconnecting" hint, bounded by the device code lifetime.
+     */
     private fun startPolling() {
         pollJob?.cancel()
         pollJob = viewModelScope.launch {
             val deviceCode = currentDeviceCode ?: return@launch
+            var backoffInterval = currentInterval
 
             while (true) {
-                delay(currentInterval * 1000L)
+                delay(backoffInterval.seconds)
 
                 when (val result = api.pollToken(deviceCode, currentInterval)) {
                     is TokenPollResult.Success -> {
@@ -75,10 +109,24 @@ internal class CloudSignInViewModel @Inject constructor() : ViewModel() {
                         return@launch
                     }
                     is TokenPollResult.Pending -> {
-                        // Continue polling
+                        clearReconnecting()
+                        backoffInterval = currentInterval
                     }
                     is TokenPollResult.SlowDown -> {
                         currentInterval = result.newInterval
+                        backoffInterval = currentInterval
+                        clearReconnecting()
+                    }
+                    is TokenPollResult.TransientError -> {
+                        if (isDeviceCodeExpired()) {
+                            _uiState.value = DeviceFlowUiState.Error(
+                                message = "連線逾時，請重新開始登入",
+                                canRetry = true,
+                            )
+                            return@launch
+                        }
+                        showReconnecting()
+                        backoffInterval = (backoffInterval * 2).coerceAtMost(MAX_POLL_BACKOFF_SECONDS)
                     }
                     is TokenPollResult.Failed -> {
                         _uiState.value = DeviceFlowUiState.Error(
@@ -90,6 +138,19 @@ internal class CloudSignInViewModel @Inject constructor() : ViewModel() {
                 }
             }
         }
+    }
+
+    private fun isDeviceCodeExpired(): Boolean {
+        val deadline = pollDeadline ?: return false
+        return clock.now() >= deadline
+    }
+
+    private fun showReconnecting() {
+        waitingState?.let { _uiState.value = it.copy(isReconnecting = true) }
+    }
+
+    private fun clearReconnecting() {
+        waitingState?.let { _uiState.value = it }
     }
 
     override fun onCleared() {
@@ -105,6 +166,7 @@ internal sealed interface DeviceFlowUiState {
         val userCode: String,
         val verificationUri: String,
         val verificationUriComplete: String,
+        val isReconnecting: Boolean = false,
     ) : DeviceFlowUiState
     data class Authorized(val accessToken: String) : DeviceFlowUiState
     data class Error(val message: String, val canRetry: Boolean) : DeviceFlowUiState
