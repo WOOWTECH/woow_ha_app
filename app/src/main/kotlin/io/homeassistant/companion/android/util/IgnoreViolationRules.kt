@@ -26,6 +26,7 @@ val threadPolicyIgnoredViolationRules = listOf(
     IgnoreAndroidAutoRendererServiceDiskRead,
     IgnoreMiuiFontDiskRead,
     IgnoreMiuiTurboSchedMonitorDiskRead,
+    IgnoreMiuiEnterpriseFrameworkDiskRead,
     IgnoreChromiumKeyStoreDiskWrite,
     IgnoreAppCompatPersistLocalesDiskReadWrite,
 )
@@ -280,6 +281,35 @@ private data object IgnoreMiuiTurboSchedMonitorDiskRead : IgnoreViolationRule {
 
         return violation.stackTrace.any {
             it.className == "android.os.TurboSchedMonitorImpl"
+        }
+    }
+}
+
+/**
+ * Ignore a [DiskReadViolation] in MIUI's Enterprise framework stub.
+ *
+ * On MIUI/HyperOS, any call to [android.app.NotificationManager.notify] transits through
+ * `miui.enterprise.ApplicationHelperStub` to check MDM/enterprise notification restrictions.
+ * The stub's static initializer resolves via `miui.enterprise.EpFrameworkFactory.get`, which
+ * calls `isEnterpriseJarExists` — a `File.exists()` on the main-thread notification path.
+ *
+ * Observed as an alpha13 cold-start FailFast on Xiaomi Pad 6 (Android 14, HyperOS) when
+ * WorkManager's `SystemForegroundService.notify` posted the first foreground service
+ * notification (frames: `androidx.work.impl.foreground.SystemForegroundService.notify` →
+ * `NotificationManager.notify` → `miui.enterprise.ApplicationHelperStub.<clinit>`).
+ *
+ * The frame that declares the read may vary between `EpFrameworkFactory` and other siblings
+ * in the same MIUI enterprise stub package, so the match is kept broad on the
+ * `miui.enterprise.` package prefix — all of which is MIUI system MDM code beyond application
+ * control.
+ */
+private data object IgnoreMiuiEnterpriseFrameworkDiskRead : IgnoreViolationRule {
+    @RequiresApi(Build.VERSION_CODES.P)
+    override fun shouldIgnore(violation: Violation): Boolean {
+        if (violation !is DiskReadViolation) return false
+
+        return violation.stackTrace.any {
+            it.className.startsWith("miui.enterprise.")
         }
     }
 }
