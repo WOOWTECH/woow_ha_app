@@ -361,7 +361,10 @@ private fun AnimatedIcon() {
         )
         val pulse by rememberInfiniteTransition(label = "icon_pulse").animateFloat(
             initialValue = 1f,
-            targetValue = 1.15f,
+            // Keep pulse small so the icon stays inside the dots ring inner-clear zone
+            // (~68dp radius in a 220dp viewport). 1.15f used to breach that; 1.05f is safe
+            // for brand images with wordmarks as well.
+            targetValue = 1.05f,
             animationSpec = infiniteRepeatable(
                 animation = tween(durationMillis = 800, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse,

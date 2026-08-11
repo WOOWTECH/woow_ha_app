@@ -628,7 +628,7 @@ class HAColorScheme(
 }
 
 val DarkHAColorScheme = HAColorScheme(
-    colorFillPrimaryLoudResting = HAColors.Primary40,
+    colorFillPrimaryLoudResting = HAColors.Primary50,
     colorFillPrimaryNormalResting = HAColors.Primary10,
     colorFillPrimaryQuietResting = HAColors.Primary05,
     colorFillPrimaryLoudHover = HAColors.Primary30,
@@ -706,7 +706,7 @@ val DarkHAColorScheme = HAColorScheme(
 )
 
 val LightHAColorScheme = HAColorScheme(
-    colorFillPrimaryLoudResting = HAColors.Primary40,
+    colorFillPrimaryLoudResting = HAColors.Primary50,
     colorFillPrimaryNormalResting = HAColors.Primary90,
     colorFillPrimaryQuietResting = HAColors.Primary95,
     colorFillPrimaryLoudHover = HAColors.Primary30,
