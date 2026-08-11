@@ -76,7 +76,7 @@ object DataUriDownloadManager {
                 }
 
                 // URLUtil doesn't handle data URIs correctly, so we have to use a generic filename
-                var fileName = "Home Assistant ${SimpleDateFormat(
+                var fileName = "woowtech Home ${SimpleDateFormat(
                     "yyyy-MM-dd HH:mm:ss",
                     Locale.getDefault(),
                 ).format(Date())}"
