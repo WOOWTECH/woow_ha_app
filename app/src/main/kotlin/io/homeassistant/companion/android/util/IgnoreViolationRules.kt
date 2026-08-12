@@ -248,16 +248,21 @@ private data object IgnoreAndroidAutoRendererServiceDiskRead : IgnoreViolationRu
 }
 
 /**
- * Ignore a [DiskReadViolation] raised from MIUI's system font package (`miui.util.font.*`).
+ * Ignore a [DiskReadViolation] raised from MIUI's system font utilities (`miui.util.*`).
  *
- * MIUI reads font files from disk on the main thread from more than one class in this package:
- * `FontSettings` checks for custom theme fonts during Activity creation, and `MultiLangHelper`
- * probes multi-language font info during the first Compose text draw. The latter runs inside a
- * static initializer, so it fires once per process on every cold start and FailFast-crashes MIUI
- * debug builds (see https://github.com/WOOWTECH/woow_ha_app/issues/4). Because the frame that
- * declares the read varies between these sibling classes, the match is kept broad on the
- * `miui.util.font.` package prefix, all of which is MIUI system font code beyond application
- * control.
+ * MIUI reads font files from disk on the main thread from several sibling classes rooted at
+ * `miui.util`:
+ *   - `miui.util.font.FontSettings` — checks for custom theme fonts during Activity creation
+ *   - `miui.util.font.MultiLangHelper` — probes multi-language font info during the first
+ *     Compose text draw (runs inside a static initializer, fires once per process cold start,
+ *     see https://github.com/WOOWTECH/woow_ha_app/issues/4)
+ *   - `miui.util.TypefaceHelper` / `miui.util.TypefaceUtils` — resolves MIUI custom typefaces
+ *     via `Font.Builder` when Compose renders a new typography variant (observed as an
+ *     alpha15 crash on Mi 11 Ultra, HyperOS 2.0.7 CN, when opening the device/settings page)
+ *
+ * All of these are MIUI system font code beyond application control, and the frame that
+ * declares the read varies between siblings, so the match is kept broad on the `miui.util.`
+ * package prefix.
  */
 private data object IgnoreMiuiFontDiskRead : IgnoreViolationRule {
     @RequiresApi(Build.VERSION_CODES.P)
@@ -265,7 +270,7 @@ private data object IgnoreMiuiFontDiskRead : IgnoreViolationRule {
         if (violation !is DiskReadViolation) return false
 
         return violation.stackTrace.any {
-            it.className.startsWith("miui.util.font.")
+            it.className.startsWith("miui.util.")
         }
     }
 }
