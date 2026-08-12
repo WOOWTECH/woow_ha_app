@@ -27,6 +27,7 @@ val threadPolicyIgnoredViolationRules = listOf(
     IgnoreMiuiFontDiskRead,
     IgnoreMiuiTurboSchedMonitorDiskRead,
     IgnoreMiuiEnterpriseFrameworkDiskRead,
+    IgnoreMediatekFrameworkDiskAccess,
     IgnoreChromiumKeyStoreDiskWrite,
     IgnoreAppCompatPersistLocalesDiskReadWrite,
 )
@@ -364,5 +365,34 @@ private data object IgnoreChromiumKeyStoreDiskWrite : IgnoreViolationRule {
             violation.stackTrace.any {
                 it.fileName?.startsWith("chromium-") == true
             }
+    }
+}
+
+/**
+ * Ignore a [DiskReadViolation] or [DiskWriteViolation] raised from MediaTek OEM performance /
+ * boost framework packages (`com.mediatek.*`).
+ *
+ * On Xiaomi/MTK devices (observed on POCO C85, SoC `mt6768` Helio G88, HyperOS 2.0), the vendor
+ * PowerHAL and BoostFwk performance-hint frameworks perform synchronous `File.exists()` /
+ * `File.length()` probes on the main thread to classify the foreground app as game vs non-game.
+ * The reads propagate back to the app via in-process callbacks, fatally crashing debug builds
+ * through the FailFast handler. Two distinct call paths were seen on alpha14:
+ *
+ *   - `com.mediatek.boostfwk.utils.Util.isGameApp` (via `perfHint` from touch input dispatch)
+ *   - `com.mediatek.scnmodule.ScnModule.isGameAppFileSize` (via `PowerHalWrapper.amsBoostNotify`
+ *     from Activity state changes)
+ *
+ * The frame declaring the read varies between MediaTek sibling packages, so the match is kept
+ * broad on the `com.mediatek.` package prefix — all of which is MTK vendor framework code
+ * beyond application control.
+ */
+private data object IgnoreMediatekFrameworkDiskAccess : IgnoreViolationRule {
+    @RequiresApi(Build.VERSION_CODES.P)
+    override fun shouldIgnore(violation: Violation): Boolean {
+        if (violation !is DiskReadViolation && violation !is DiskWriteViolation) return false
+
+        return violation.stackTrace.any {
+            it.className.startsWith("com.mediatek.")
+        }
     }
 }
