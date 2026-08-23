@@ -374,3 +374,7 @@ merged_results.sarif
 ## Local test evidence: device crash traces, screenshots, repro scripts and
 ## downloaded APKs. Large binaries, never committed.
 _test/
+
+# Local AI-tooling session artifacts (never commit)
+.playwright-mcp/
+.superpowers/

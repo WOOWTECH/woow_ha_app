@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cloud edition identity. Overrides the app_name from :common so the shared strings file
+     stays untouched and byte-comparable with upstream. -->
+<resources>
+    <string name="app_name">woowtech Home Cloud</string>
+</resources>

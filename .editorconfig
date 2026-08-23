@@ -26,5 +26,7 @@ ij_kotlin_allow_trailing_comma = true
 ktlint_standard_function-expression-body = disabled
 max_line_length = 120
 
-[**/test/**.kt]
+# test also covers the flavored unit-test source sets introduced by the edition dimension
+# (testOnprem/testCloud), which the plain test/ glob does not match.
+[**/{test,testOnprem,testCloud}/**.kt]
 max_line_length = off

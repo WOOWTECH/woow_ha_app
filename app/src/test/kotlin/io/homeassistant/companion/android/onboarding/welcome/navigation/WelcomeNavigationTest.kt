@@ -11,6 +11,7 @@ import dagger.hilt.android.testing.HiltTestApplication
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.onboarding.BaseOnboardingNavigationTest
 import io.homeassistant.companion.android.onboarding.URL_GETTING_STARTED_DOCUMENTATION
+import io.homeassistant.companion.android.onboarding.assumeOnboardingStartsAtWelcome
 import io.homeassistant.companion.android.testing.unit.stringResource
 import io.homeassistant.companion.android.util.compose.navigateToUri
 import io.mockk.coVerify
@@ -30,6 +31,7 @@ internal class WelcomeNavigationTest : BaseOnboardingNavigationTest() {
 
     @Test
     fun `Given no action when starting the app then show Welcome`() {
+        assumeOnboardingStartsAtWelcome()
         testNavigation {
             assertTrue(navController.currentBackStackEntry?.destination?.hasRoute<WelcomeRoute>() == true)
             onNodeWithText(stringResource(commonR.string.welcome_learn_more))

@@ -2,18 +2,34 @@ package io.homeassistant.companion.android.onboarding
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import io.homeassistant.companion.android.onboarding.welcome.navigation.WelcomeRoute
+import io.homeassistant.companion.android.onboarding.cloudchooser.navigation.CloudChooserRoute
+import io.homeassistant.companion.android.onboarding.cloudchooser.navigation.cloudChooserScreen
+import io.homeassistant.companion.android.onboarding.cloudprovision.navigation.cloudProvisionScreen
+import io.homeassistant.companion.android.onboarding.cloudprovision.navigation.navigateToCloudProvisionAfterSignIn
+import io.homeassistant.companion.android.onboarding.cloudsignin.navigation.cloudSignInScreen
+import io.homeassistant.companion.android.onboarding.cloudsignin.navigation.navigateToCloudSignIn
+import io.homeassistant.companion.android.onboarding.welcome.navigation.navigateToWelcome
 
 /**
- * Cloud edition: onboarding will start at the CloudChooser screen once the cloud onboarding
- * flow is ported (PRD docs/plans/2026-08-23-prd-cloud-edition-single-repo.md, Phase 0 step 3).
- *
- * Skeleton placeholder: behaves exactly like the on-premise edition so every variant compiles
- * before the port lands. Replaced by the real chooser wiring in the port commit.
+ * Cloud edition: onboarding starts at the CloudChooser screen, which offers the local flow
+ * (identical to the on-premise edition) or the WOOW cloud sign-in and provisioning flow.
  */
-internal fun editionStartDestination(): Any = WelcomeRoute
+internal fun editionStartDestination(): Any = CloudChooserRoute
 
-@Suppress("UnusedReceiverParameter", "UNUSED_PARAMETER")
+/**
+ * Registers the three cloud onboarding screens. The wiring mirrors the cloud repository at
+ * `893eae55` verbatim - in particular `navigateToCloudProvisionAfterSignIn`, which removes the
+ * authorized sign-in screen from the back stack so that back from provisioning cannot land on a
+ * dead sign-in session.
+ */
 internal fun NavGraphBuilder.editionScreens(navController: NavController) {
-    // Replaced by cloudChooserScreen/cloudSignInScreen/cloudProvisionScreen in the port commit.
+    cloudChooserScreen(
+        onLocalClick = { navController.navigateToWelcome() },
+        onCloudClick = { navController.navigateToCloudSignIn() },
+    )
+    cloudSignInScreen(
+        onBackClick = navController::popBackStack,
+        onAuthorized = navController::navigateToCloudProvisionAfterSignIn,
+    )
+    cloudProvisionScreen(onBackClick = navController::popBackStack)
 }

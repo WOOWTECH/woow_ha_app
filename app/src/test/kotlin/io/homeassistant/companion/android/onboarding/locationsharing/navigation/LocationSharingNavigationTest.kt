@@ -8,6 +8,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.onboarding.BaseOnboardingNavigationTest
+import io.homeassistant.companion.android.onboarding.assumeOnboardingStartsAtWelcome
 import io.homeassistant.companion.android.onboarding.locationforsecureconnection.navigation.LocationForSecureConnectionRoute
 import io.homeassistant.companion.android.onboarding.welcome.navigation.WelcomeRoute
 import io.homeassistant.companion.android.testing.unit.stringResource
@@ -28,6 +29,7 @@ internal class LocationSharingNavigationTest : BaseOnboardingNavigationTest() {
 
     @Test
     fun `Given LocationSharing when agreeing with plain text access to share then show LocationForSecureConnection then goes back stop the app`() {
+        assumeOnboardingStartsAtWelcome()
         testNavigation {
             navController.navigateToLocationSharing(42, true)
             assertTrue(navController.currentBackStackEntry?.destination?.hasRoute<LocationSharingRoute>() == true)
@@ -63,6 +65,7 @@ internal class LocationSharingNavigationTest : BaseOnboardingNavigationTest() {
 
     @Test
     fun `Given LocationSharing when denying to share with plain text access then goes to LocationForSecureConnection then goes back stop the app`() {
+        assumeOnboardingStartsAtWelcome()
         testNavigation {
             navController.navigateToLocationSharing(42, true)
             assertTrue(navController.currentBackStackEntry?.destination?.hasRoute<LocationSharingRoute>() == true)

@@ -8,6 +8,12 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
+dependencies {
+    // The WOOW PaaS data layer only exists on cloud variants; on-premise APKs must not even
+    // contain the endpoint strings. See docs/plans/2026-08-23-prd-cloud-edition-single-repo.md.
+    "cloudImplementation"(project(":cloud-data"))
+}
+
 android {
     useLibrary("android.car")
 
