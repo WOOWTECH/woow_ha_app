@@ -26,12 +26,21 @@ class AndroidFullMinimalFlavorConventionPlugin : Plugin<Project> {
                 flavorDimensions.add("version")
                 productFlavors {
                     create("minimal") {
+                        // Explicit dimension: implicit assignment only works while the module has a
+                        // single dimension, and :app adds an "edition" dimension on top of this one.
+                        dimension = "version"
                         applicationIdSuffix = ".minimal"
                         versionNameSuffix = "-minimal"
+                        buildConfigField("Boolean", "IS_FULL", "false")
                     }
                     create("full") {
+                        dimension = "version"
                         applicationIdSuffix = ""
                         versionNameSuffix = "-full"
+                        // Code must branch on IS_FULL, never on BuildConfig.FLAVOR string compares:
+                        // with more than one dimension FLAVOR becomes the combined name
+                        // ("fullOnprem"), silently failing every == "full" comparison.
+                        buildConfigField("Boolean", "IS_FULL", "true")
                     }
 
                     // Generate a list of application ids into BuildConfig

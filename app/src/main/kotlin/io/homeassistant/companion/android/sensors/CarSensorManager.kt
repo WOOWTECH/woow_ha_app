@@ -284,7 +284,7 @@ class CarSensorManager :
     override fun hasSensor(context: Context): Boolean {
         this.latestContext = context.applicationContext
 
-        return isAutomotive || (areCarSensorApisAvailable && BuildConfig.FLAVOR == "full")
+        return isAutomotive || (areCarSensorApisAvailable && BuildConfig.IS_FULL)
     }
 
     override fun requiredPermissions(context: Context, sensorId: String): Array<String> {

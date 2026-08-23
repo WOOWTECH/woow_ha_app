@@ -113,6 +113,7 @@ homeassistant-android-application = { id = "homeassistant.android.application" }
 homeassistant-android-common = { id = "homeassistant.android.common" }
 homeassistant-android-compose = { id = "homeassistant.android.compose" }
 homeassistant-android-dependencies = { id = "homeassistant.android.dependencies" }
+homeassistant-android-edition = { id = "homeassistant.android.edition" }
 homeassistant-android-flavor = { id = "homeassistant.android.flavor" }
 
 [libraries]

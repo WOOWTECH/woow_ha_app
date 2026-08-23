@@ -57,7 +57,7 @@ class DeveloperSettingsFragment :
         }
 
         findPreference<Preference>("location_tracking")?.let {
-            it.isVisible = BuildConfig.FLAVOR == "full"
+            it.isVisible = BuildConfig.IS_FULL
             it.setOnPreferenceClickListener {
                 parentFragmentManager.commit {
                     replace(R.id.content, LocationTrackingFragment::class.java, null)

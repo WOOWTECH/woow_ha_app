@@ -37,7 +37,6 @@ import io.homeassistant.companion.android.onboarding.sethomenetwork.navigation.s
 import io.homeassistant.companion.android.onboarding.wearmtls.navigation.URL_MTLS_DOCUMENTATION
 import io.homeassistant.companion.android.onboarding.wearmtls.navigation.navigateToWearMTLS
 import io.homeassistant.companion.android.onboarding.wearmtls.navigation.wearMTLSScreen
-import io.homeassistant.companion.android.onboarding.welcome.navigation.WelcomeRoute
 import io.homeassistant.companion.android.onboarding.welcome.navigation.welcomeScreen
 import io.homeassistant.companion.android.util.canGoBack
 import io.homeassistant.companion.android.util.compose.navigateToUri
@@ -117,12 +116,15 @@ internal fun NavGraphBuilder.onboarding(
     }
 
     val startDestination = when {
-        !skipWelcome -> WelcomeRoute
+        // The edition decides where onboarding starts: on-premise goes straight to Welcome,
+        // cloud inserts its chooser first. Implementations live in the edition source sets.
+        !skipWelcome -> editionStartDestination()
         urlToOnboard.isNullOrEmpty() -> ServerDiscoveryRoute(serverDiscoveryMode)
         else -> ConnectionRoute(urlToOnboard)
     }
 
     navigation<OnboardingRoute>(startDestination = startDestination) {
+        editionScreens(navController)
         welcomeScreen(
             onConnectClick = {
                 if (urlToOnboard.isNullOrEmpty()) {

@@ -682,7 +682,7 @@ class WebViewPresenterImpl @Inject constructor(
     }
 
     override suspend fun onNotificationPermissionResult(granted: Boolean) {
-        if (granted && BuildConfig.FLAVOR != "full") {
+        if (granted && !BuildConfig.IS_FULL) {
             settingsDao.insert(
                 Setting(
                     serverId,
@@ -713,7 +713,7 @@ class WebViewPresenterImpl @Inject constructor(
             serverId,
         ).shouldAskNotificationPermission()
 
-        if (isPermissionAlreadyGranted && BuildConfig.FLAVOR == "full") {
+        if (isPermissionAlreadyGranted && BuildConfig.IS_FULL) {
             serverManager.integrationRepository(serverId).setAskNotificationPermission(false)
             return false
         }

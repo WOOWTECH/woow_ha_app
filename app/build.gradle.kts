@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.homeassistant.android.application)
     alias(libs.plugins.homeassistant.android.flavor)
+    alias(libs.plugins.homeassistant.android.edition)
     alias(libs.plugins.firebase.appdistribution)
     alias(libs.plugins.google.services)
     alias(libs.plugins.homeassistant.android.dependencies)

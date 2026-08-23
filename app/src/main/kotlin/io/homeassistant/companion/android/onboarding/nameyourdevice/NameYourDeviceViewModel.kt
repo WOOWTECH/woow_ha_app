@@ -14,6 +14,7 @@ import io.homeassistant.companion.android.common.data.integration.DeviceRegistra
 import io.homeassistant.companion.android.common.data.servers.ServerManager
 import io.homeassistant.companion.android.common.util.AppVersionProvider
 import io.homeassistant.companion.android.common.util.MessagingTokenProvider
+import io.homeassistant.companion.android.onboarding.ServerRegisteredListener
 import io.homeassistant.companion.android.onboarding.nameyourdevice.navigation.NameYourDeviceRoute
 import io.homeassistant.companion.android.util.isPubliclyAccessible
 import java.net.URL
@@ -59,6 +60,7 @@ internal class NameYourDeviceViewModel @VisibleForTesting constructor(
     private val serverRegistrationRepository: ServerRegistrationRepository,
     private val appVersionProvider: AppVersionProvider,
     private val messagingTokenProvider: MessagingTokenProvider,
+    private val serverRegisteredListeners: Set<ServerRegisteredListener> = emptySet(),
     defaultName: String = Build.MODEL,
 ) : ViewModel() {
 
@@ -69,12 +71,14 @@ internal class NameYourDeviceViewModel @VisibleForTesting constructor(
         serverRegistrationRepository: ServerRegistrationRepository,
         appVersionProvider: AppVersionProvider,
         messagingTokenProvider: MessagingTokenProvider,
+        serverRegisteredListeners: Set<@JvmSuppressWildcards ServerRegisteredListener>,
     ) : this(
         savedStateHandle.toRoute<NameYourDeviceRoute>(),
         serverManager,
         serverRegistrationRepository,
         appVersionProvider,
         messagingTokenProvider,
+        serverRegisteredListeners,
     )
 
     private val _navigationEventsFlow = MutableSharedFlow<NameYourDeviceNavigationEvent>()
@@ -155,6 +159,11 @@ internal class NameYourDeviceViewModel @VisibleForTesting constructor(
             )
             // Active the newly added server
             serverManager.activateServer(serverId)
+
+            // Editions react to the completed registration here (see ServerRegisteredListener):
+            // awaited before onboarding proceeds, and still inside this try so an unexpected
+            // failure rolls the registration back like any other fatal error.
+            serverRegisteredListeners.forEach { it.onServerRegistered() }
 
             return serverId
         } catch (e: Exception) {

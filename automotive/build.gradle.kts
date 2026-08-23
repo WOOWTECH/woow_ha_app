@@ -38,7 +38,9 @@ android {
     sourceSets {
         getByName("main") {
             kotlin {
-                srcDirs("../app/src/main/kotlin")
+                // The onprem directory provides the edition hooks that app/src/main calls
+                // (automotive is always the on-premise edition and has no edition dimension).
+                srcDirs("../app/src/main/kotlin", "../app/src/onprem/kotlin")
             }
             assets {
                 srcDirs("../app/src/main/assets")
