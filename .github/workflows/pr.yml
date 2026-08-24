@@ -115,7 +115,11 @@ jobs:
           mock-google-services: "true"
 
       - name: Validate Screenshot Previews
-        run: ./gradlew validateDebugScreenshotTest validateFullDebugScreenshotTest
+        # Project-qualified on purpose: an unqualified task name is also matched by
+        # :automotive, and after the edition dimension renamed :app's task, Gradle would
+        # silently run only the automotive one and report green while the 257 :app
+        # references went unvalidated.
+        run: ./gradlew :common:validateDebugScreenshotTest :wear:validateDebugScreenshotTest :app:validateFullOnpremDebugScreenshotTest
 
       - name: Upload test results
         if: always()
@@ -208,7 +212,11 @@ jobs:
           KEYSTORE_PASSWORD: android
         # Disable lint tasks since we have a dedicated job for this in the workflow
         run: |
-          ./gradlew :common:assemble :app:assembleRelease :wear:assembleRelease :automotive:assembleRelease
+          # Explicit onprem variants, not the assembleRelease aggregate: the aggregate would
+          # silently pull the cloud release variants into this job, doubling R8 work in a job
+          # that already runs close to its heap limit. Cloud release builds are wired up in
+          # the release pipeline phase of the edition PRD, not here.
+          ./gradlew :common:assemble :app:assembleFullOnpremRelease :app:assembleMinimalOnpremRelease :wear:assembleRelease :automotive:assembleRelease
 
   unit_tests:
     name: "Unit Tests"
@@ -224,7 +232,7 @@ jobs:
 
       - name: Run test
         # Run testFullDebugUnitTest at the app level since :automotive shares the same sourceSet than app. Minimal and Full are the same in unit tests for now
-        run: ./gradlew testDebugUnitTest :app:testFullDebugUnitTest :lint:test
+        run: ./gradlew testDebugUnitTest :app:testFullOnpremDebugUnitTest :app:testFullCloudDebugUnitTest :lint:test
 
       - name: Upload test results
         if: always()
@@ -247,12 +255,12 @@ jobs:
             arch: x86_64
             profile: "Nexus 5"
             target: "google_apis"
-            gradle_target: ":app:connectedFullDebugAndroidTest :app:connectedMinimalDebugAndroidTest :common:connectedDebugAndroidTest"
+            gradle_target: ":app:connectedFullOnpremDebugAndroidTest :app:connectedMinimalOnpremDebugAndroidTest :common:connectedDebugAndroidTest"
           - api-level: 36
             arch: x86_64
             profile: "pixel_7"
             target: "google_apis"
-            gradle_target: ":app:connectedFullDebugAndroidTest :app:connectedMinimalDebugAndroidTest :common:connectedDebugAndroidTest"
+            gradle_target: ":app:connectedFullOnpremDebugAndroidTest :app:connectedMinimalOnpremDebugAndroidTest :common:connectedDebugAndroidTest"
           - api-level: 33
             arch: x86_64
             profile: "automotive_1024p_landscape"

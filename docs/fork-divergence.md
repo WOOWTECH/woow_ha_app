@@ -62,3 +62,29 @@ These are not caused by any single change and each deserves its own issue:
 - `ConnectionViewModelTest > ...onReceivedError...` fails on a Turbine timeout.
 - `ktlintCheck` reports violations in ~10 files unrelated to any recent change.
 - `google-services.json` is absent for `:app`, `:automotive` and `:wear`; nothing builds without it.
+
+## Edition dimension (cloud/on-premise in one repo, 2026-08-24)
+
+Implemented per `docs/plans/2026-08-23-prd-cloud-edition-single-repo.md`. The former
+`WOOWTECH/woow_ha_app_cloud_vesion` repo is superseded by the `cloud` edition here.
+
+| File / area | Difference | Why | Upstream status |
+|---|---|---|---|
+| `AndroidEditionFlavorConventionPlugin.kt`, `app/src/cloud|onprem/`, `:cloud-data`, `app/src/testCloud|testOnprem/` | New files/modules | Cloud edition | Fork-only, never upstreamed |
+| `OnboardingNavigation.kt` | ~5 lines: edition hooks | Start destination + screens per edition | Re-apply on rebase |
+| `NameYourDeviceViewModel.kt` | ~5 lines: `ServerRegisteredListener` set | Cloud session cleanup seam | Re-apply on rebase |
+| 18 `BuildConfig.FLAVOR == "full"` sites | 1 line each -> `BuildConfig.IS_FULL` | Two dimensions make FLAVOR the combined name; string compares silently fail | If upstream adds a new comparison, rewrite it to `IS_FULL` during rebase |
+| `AndroidFullMinimalFlavorConventionPlugin.kt` | explicit `dimension` + `IS_FULL` fields | Same | Re-apply on rebase |
+| `automotive/build.gradle.kts` | +1 srcDir (`../app/src/onprem/kotlin`) | Edition hooks for automotive | Re-apply on rebase |
+| `settings.gradle.kts` | `:cloud-data` include | D6 | Re-apply on rebase |
+| `app/build.gradle.kts` | edition plugin alias + `cloudImplementation` | — | Re-apply on rebase |
+| `.editorconfig` | test glob covers `testOnprem`/`testCloud` | Flavored test source sets keep the line-length exemption | Re-apply on rebase |
+| `app/src/screenshotTestFullDebug/` -> `app/src/screenshotTestFullOnpremDebug/` | Directory renamed | Variant rename moved the reference lookup path | **Every upstream golden addition/update lands in the old path and must be re-routed on rebase** (PRD risk #2 fallback; AGP offers no stable remap for screenshot reference dirs) |
+| `.github/workflows/{pr,onPush,updateScreenshot}.yml` | Variant task renames; release aggregates replaced with explicit onprem lists | Aggregates would silently sign cloud releases / double R8; unqualified screenshot task names get shadowed by `:automotive` and hollow out the gate | Compare against upstream on every workflow rebase |
+| 8 shared onboarding nav tests | +1 line each: `assumeOnboardingStartsAtWelcome()` | Those specs pin the Welcome entry; cloud starts at the chooser and skips them visibly | Re-apply on rebase |
+
+Cloud screenshot tests live in `app/src/screenshotTestCloud/` (flavor-scoped source set,
+verified supported). Their reference images are deliberately not generated yet: goldens must be
+produced by `updateScreenshot.yml` on ubuntu-latest (platform discipline; macOS renders diverge),
+and cloud validation is not part of the PR gate until then. `:app:updateFullCloudDebugScreenshotTest`
+is the task to wire in when that day comes.

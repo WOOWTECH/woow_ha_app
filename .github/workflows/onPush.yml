@@ -66,7 +66,9 @@ jobs:
           VERSION_CODE: ${{ steps.rel_number.outputs.version-code }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
-          ./gradlew :common:assemble :app:assembleRelease :wear:assembleRelease :automotive:assembleRelease
+          # Explicit onprem variants: the weekly release must not silently build and sign
+          # cloud variants with the production keystore (see the edition PRD).
+          ./gradlew :common:assemble :app:assembleFullOnpremRelease :app:assembleMinimalOnpremRelease :wear:assembleRelease :automotive:assembleRelease
 
       - name: Archive Build
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -107,7 +109,7 @@ jobs:
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.ORIGINAL_KEYSTORE_ALIAS_PASSWORD }}
           VERSION_CODE: ${{ steps.rel_number.outputs.version-code }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: ./gradlew appDistributionUploadFullRelease
+        run: ./gradlew appDistributionUploadFullOnpremRelease
 
       - name: Prepare Amazon Listing
         if: github.event.inputs.beta == 'true'
@@ -176,7 +178,7 @@ jobs:
           VERSION_CODE: ${{ steps.rel_number.outputs.version-code }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
-          ./gradlew :common:assemble :app:bundleFullRelease :wear:bundleRelease :automotive:bundleFullRelease
+          ./gradlew :common:assemble :app:bundleFullOnpremRelease :wear:bundleRelease :automotive:bundleFullRelease
 
       - name: Archive Build
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
