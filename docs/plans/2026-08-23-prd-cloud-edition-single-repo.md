@@ -19,6 +19,7 @@
 | D3 | `stg.woowtech.io` CF-Access | **維持 integrated 最新 commit 的現況**：debug→`stg.woowtech.io`、release→`paas.woowtech.io`（`59f126d4` 曾臨時把 debug 指向 prod，`d8114e38` 已 revert，revert 後狀態即為定案）。CF-Access 擋實機測試的問題不在本計畫內處理 |
 | D4 | cloud 功能是否重構 | **不重構，照 port**（2026-08-24 architect review 結論，見 §2.3 架構品質列）。僅做移植機制本身強制的搬移；明確否決 UseCase 抽取、Repository 拆分、MVI 化、DataStore 遷移等任何「順手改善」 |
 | D5 | variant 矩陣規模（2026-08-24 party review，Winston 提議砍 `minimalCloud` 降為 6） | **保留 8 個 variant。** 理由：repo 為 public，GitHub Actions 免費（已核實），CI 成本論不成立；保留對稱矩陣的未來彈性。Winston 的「minimalCloud 無消費者」觀察屬實，記錄於此供未來重議 |
+| D7 | 自動化測試範圍（2026-08-26） | **三層全做、全自動**（Layer 1 單元／Layer 2 假 PaaS 儀器／Layer 3 真 server E2E），但每層只放該層獨有價值的必要測試，下層已蓋的情境不上移。詳見 §10；Layer 3 受外部前置 P1–P3 約束 |
 | D6 | `:cloud-data` module 存廢（party review，Winston 主張改放 `app/src/cloud/`） | **保留 module。** Winston 對兩條原始論證的反駁屬實（lockfile 因 dimension 改名無論如何整檔重寫；`app/build.gradle.kts` 因 plugin alias 無論如何要改），但模組邊界的長期價值（未來第二個消費者、依賴封裝）由決策者拍板保留。代價照實記帳：`settings.gradle.kts` +1 行、`:cloud-data/gradle.lockfile` 需產生並 commit、風險 #8 |
 
 ---
@@ -530,42 +531,91 @@ flowchart TB
 | F2 | Token 儲存加密 | `woow_paas_0` 與**既有的** `session_0`（HA 自己的 token 也是明文 SharedPreferences——cloud 的做法與 app 現狀一致，非新增風險）一併遷往 encrypted DataStore。`WoowPaasSessionRepository` 介面已為此預留 `@throws IOException` 契約，以 `woow_paas_0` 為低風險先導（無既有安裝遷移問題） |
 | F3 | cloud edition Firebase entry | Phase 2 步驟 11（D2） |
 
-## 10. 自動化測試範圍（2026-08-26 增補，原則：只測必要的）
+## 10. 自動化測試範圍（2026-08-26 增補；同日決策 D7：三層全做、全自動）
 
-目標只有一個：**不搞壞既有功能**。以「風險 × 現有覆蓋」逐項判斷，
-只補沒人守著的關鍵面，其餘明確列入不做清單以免日後重複辯論。
+原則不變：**只測必要的、不搞壞既有功能**。三層的分工是——Layer 1 守零件、
+Layer 2 守組裝、Layer 3 守「真實世界還跟我們想的一樣」。每層只放該層
+獨有價值的測試；任何在下層已覆蓋的情境，不在上層重複。
 
-### 10.1 現有覆蓋（不必重做）
+### 10.1 Layer 1（單元測試）——現有 143＋必要新增 1 檔
+
+現有覆蓋（不必重做）：
 
 | 防線 | 數量 | 守住什麼 |
 |---|---|---|
 | `:cloud-data` 單元測試 | 80 | device flow 狀態機、401 refresh＋rotation 鎖、409、session 持久化、錯誤分類 |
-| `app/testCloud` 單元測試 | 53 | 三畫面 ViewModel、UI 互動、導航（含返回鍵死路迴歸） |
+| `app/testCloud` 單元測試 | 53 | 三畫面 ViewModel、UI 互動、導航（含返回鍵死路迴歸）、**M1 拒絕／M2 過期／M3 斷網的狀態機分支** |
 | 共用導航測試（onprem 變體執行） | 8 | **Hook 1 的 onprem 語意**——Welcome 為起點、back-stack 形狀不變 |
-| Hook 2 測試（2026-08-26 已補，`ff908cc1`） | 5 | listener 恰好一次且在 activateServer 後、註冊失敗不觸發、listener 拋錯回滾註冊、cloud 清 session、儲存失敗吞掉 |
-| 手動 E2E（2026-08-25/26 實測） | — | release/R8 APK 對 prod 全程：授權→開通→實例儀表板 |
+| Hook 2 測試（`ff908cc1`） | 5 | listener 恰好一次且在 activateServer 後、註冊失敗不觸發、拋錯回滾、cloud 清 session、儲存失敗吞掉 |
 
-### 10.2 必要新增：一個測試檔（T1）
-
-**`EditionBuildConfigInvariantsTest`**（`app/src/test/`，隨兩個 edition 的
-variant 各跑一次）——守住兩條目前**零覆蓋**、且壞掉時**靜默**的建置期布線：
+必要新增 **T1：`EditionBuildConfigInvariantsTest`**（`app/src/test/`，
+兩個 edition variant 各跑一次；約 40 行、2 個測試）：
 
 | # | 斷言 | 防的事故 |
 |---|---|---|
-| T1-a | `BuildConfig.IS_FULL == FLAVOR.startsWith("full")` | 有人改壞 convention plugin 的 IS_FULL 注入 → 位置追蹤失效、websocket 預設翻轉、設定顯隱錯亂——18 個呼叫點全部靜默降級，無其他測試會發現（party review 的第一號 blocking 復發） |
-| T1-b | `APPLICATION_IDS` 恰好 2 筆、與本 edition 相符、**無跨 edition 洩漏** | `onVariants` 覆寫或產生器被改壞 → NFC tag 指錯 app／onprem 帶入 homecloud id——`NFCUtil` 無任何測試會攔截 |
+| T1-a | `BuildConfig.IS_FULL == FLAVOR.startsWith("full")` | convention plugin 的 IS_FULL 注入被改壞 → 18 個呼叫點靜默降級（位置追蹤失效、websocket 預設翻轉）——party review 第一號 blocking 的復發防線 |
+| T1-b | `APPLICATION_IDS` 恰好 2 筆、屬於本 edition、無跨 edition 洩漏 | 產生器或 `onVariants` 覆寫被改壞 → NFC tag 指錯 app——`NFCUtil` 零其他覆蓋 |
 
-成本：1 檔約 40 行、2 個測試方法；跑在既有 CI task 內，零新基礎設施。
+### 10.2 Layer 2（儀器測試，假 PaaS）——基礎設施＋恰好 2 條測試
 
-### 10.3 明確不做（及理由）
+**機制**：Hilt `@TestInstallIn` 以測試模組取代 `WoowPaasConfigModule`，
+`WoowPaasApiConfig.baseUrl` 指向測試內嵌的 MockWebServer（localhost）；
+一個劇本 dispatcher 扮演 PaaS。**真 server 接觸：零**——跑任意次都不產生
+負載，這就是「全自動又不塞爆 server」的核心手段。位置：
+`app/src/androidTestCloud/`（flavor-scoped androidTest source set）。
+
+必要測試恰好兩條——只放「組裝層獨有、Layer 1 原理上測不到」的價值：
+
+| # | 測試 | 為什麼非它不可 |
+|---|---|---|
+| L2-1 | **組裝層 happy path**：chooser →「使用雲端服務」→ user_code 顯示 → 假 PaaS 於第 N 次輪詢放行 → token → provision → status ready → 交棒連線流程（斷言收到實例 URL） | 一條測試同時壓過：真機 Hilt graph 閉合、BuildConfig→Config 注入、真 OkHttp/Retrofit socket、跨畫面導航組裝、輪詢與 UI 狀態整合——全部是 cloud repo 歷史上「單元測試全綠仍出事」的類別（`63644a05`、`cc0b85e3`） |
+| L2-2 | **錯誤恢復迴圈**：假 PaaS 回 `access_denied` → 錯誤畫面 →「重新開始」→ 新 user_code 出現 | 錯誤「狀態」Layer 1 已測；這裡守的是錯誤後**跨畫面恢復路徑**的組裝——手測 M1 從此自動化 |
+| **CI 接線** | `:app:connectedFullCloudDebugAndroidTest` 加入 emulator matrix，**只跑一個 API level**（取矩陣中最新者） | 組裝驗證一個 level 已足；六格全開是把 onprem 的跨 API 職責錯貼到 cloud 上（不必要） |
+
+明確**不在** Layer 2 重複：M2 過期／M3 斷網／slow_down 等狀態機分支
+（Layer 1 已窮舉）、三畫面各自的 UI 細節（testCloud 已蓋）。
+
+### 10.3 Layer 3（真 server E2E）——恰好 1 條，重用 L2-1 的程式碼
+
+**機制**：同一條 L2-1 測試碼，經 instrumentation argument 切換成
+「真實環境模式」——baseUrl 指向真環境、授權步驟改由 harness 以 **HTTP 完成**
+（測試帳號憑證走 CI secrets，登入＋approve user_code，不驅動瀏覽器 UI）。
+一份測試碼、兩種 harness，無重複維護。
+
+| 規則 | 內容 |
+|---|---|
+| 觸發 | `.github/workflows/cloud-e2e.yml`：`workflow_dispatch`＋nightly `schedule`；**絕不掛 PR CI** |
+| 併發 | workflow `concurrency` group 上限 1，序列化執行 |
+| 負載 | 依 server 的 `interval`／`slow_down` 輪詢；**409 重用**既有實例——穩態成本＝1 台常駐測試實例，每輪邊際成本趨近零 |
+| 斷言邊界 | 只斷言到「交棒連線流程、拿到實例 URL」為止；不進 WebView 做 HA 註冊（那是 HA core 的功能，非本 fork 的變更面） |
+| 錯誤路徑 | **不在真 server 上測**——拒絕／過期／斷網全部由 L2-2 與 Layer 1 覆蓋 |
+
+**外部前置（缺一不可，先開 ticket）**：
+
+| # | 前置 | 負責方 |
+|---|---|---|
+| P1 | CF-Access：stg 的 `/oauth2/*`、`/api/ha-paas/*` 對 CI 放行（service token 或路徑 bypass） | PaaS／infra |
+| P2 | 專用測試帳號＋**實例配額 1**（quota 鎖死在後端） | PaaS |
+| P3 | 確認授權步驟可純 HTTP 完成（登入 API＋approve API）；若 approve 無 API 則請 PaaS 補 | PaaS |
+
+### 10.4 明確不做（及理由）
 
 | 項目 | 不做的理由 |
 |---|---|
-| IS_FULL 各消費點的行為測試（LocationTrackingSupport、Websocket 預設…） | 消費點直讀 BuildConfig，T1-a 已釘住根源；逐點測是測 Hilt provider 的樣板 |
-| Layer 2 組裝層儀器測試（Hilt `@TestInstallIn`＋MockWebServer 假 PaaS） | 組裝層剛經手動 E2E 驗證；迴歸防線由 M1–M7 release checklist 承擔。**觸發條件（F4）**：cloud 功能進入頻繁迭代、或手測第二次抓到組裝層迴歸時啟動 |
-| Layer 3 真 server E2E 自動化 | 前置未齊（CF-Access bypass、測試租戶配額）；設計已存檔於 PR 討論——三層架構、409 重用、HTTP 完成授權、絕不進 PR CI |
-| cloud screenshot goldens | 平台紀律：須由 ubuntu-latest 產生（fork-divergence.md 已載），等 cloud 驗證加入 gate 時一併 |
-| 其餘 10 條既有 ignore rule 的測試、`WoowPaasConfig` 讀值測試 | 既有債務與樣板，與「不搞壞既有功能」無關 |
+| IS_FULL 各消費點的行為測試 | 消費點直讀 BuildConfig，T1-a 已釘根源 |
+| Layer 2 錯誤矩陣全展開／六 API level 全跑 | 狀態機分支屬 Layer 1；跨 API 職責屬 onprem 既有 matrix |
+| 真 server 上的錯誤路徑測試 | 對真 server 製造錯誤＝無意義負載；L2-2 全覆蓋 |
+| E2E 深入 HA 實例內的註冊流程 | HA core 行為非本 fork 變更面；Hook 2 語意已由單元測試釘住 |
+| cloud screenshot goldens | 平台紀律：等 cloud 驗證加入 gate 時由 ubuntu-latest 產生 |
+| 其餘 10 條既有 ignore rule 測試、`WoowPaasConfig` 讀值測試 | 既有債務與樣板 |
+
+### 10.5 交付切分
+
+| 層 | 進哪裡 | 依賴 |
+|---|---|---|
+| T1 | **本 PR（#7）** | 無 |
+| Layer 2（infra＋L2-1＋L2-2＋CI lane） | 獨立 PR，緊接本 PR 之後 | 無外部依賴 |
+| Layer 3（workflow＋real-env harness） | 獨立 PR | P1–P3 齊備後 |
 
 ## 附錄：調查指令備忘
 
