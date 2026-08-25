@@ -530,6 +530,43 @@ flowchart TB
 | F2 | Token 儲存加密 | `woow_paas_0` 與**既有的** `session_0`（HA 自己的 token 也是明文 SharedPreferences——cloud 的做法與 app 現狀一致，非新增風險）一併遷往 encrypted DataStore。`WoowPaasSessionRepository` 介面已為此預留 `@throws IOException` 契約，以 `woow_paas_0` 為低風險先導（無既有安裝遷移問題） |
 | F3 | cloud edition Firebase entry | Phase 2 步驟 11（D2） |
 
+## 10. 自動化測試範圍（2026-08-26 增補，原則：只測必要的）
+
+目標只有一個：**不搞壞既有功能**。以「風險 × 現有覆蓋」逐項判斷，
+只補沒人守著的關鍵面，其餘明確列入不做清單以免日後重複辯論。
+
+### 10.1 現有覆蓋（不必重做）
+
+| 防線 | 數量 | 守住什麼 |
+|---|---|---|
+| `:cloud-data` 單元測試 | 80 | device flow 狀態機、401 refresh＋rotation 鎖、409、session 持久化、錯誤分類 |
+| `app/testCloud` 單元測試 | 53 | 三畫面 ViewModel、UI 互動、導航（含返回鍵死路迴歸） |
+| 共用導航測試（onprem 變體執行） | 8 | **Hook 1 的 onprem 語意**——Welcome 為起點、back-stack 形狀不變 |
+| Hook 2 測試（2026-08-26 已補，`ff908cc1`） | 5 | listener 恰好一次且在 activateServer 後、註冊失敗不觸發、listener 拋錯回滾註冊、cloud 清 session、儲存失敗吞掉 |
+| 手動 E2E（2026-08-25/26 實測） | — | release/R8 APK 對 prod 全程：授權→開通→實例儀表板 |
+
+### 10.2 必要新增：一個測試檔（T1）
+
+**`EditionBuildConfigInvariantsTest`**（`app/src/test/`，隨兩個 edition 的
+variant 各跑一次）——守住兩條目前**零覆蓋**、且壞掉時**靜默**的建置期布線：
+
+| # | 斷言 | 防的事故 |
+|---|---|---|
+| T1-a | `BuildConfig.IS_FULL == FLAVOR.startsWith("full")` | 有人改壞 convention plugin 的 IS_FULL 注入 → 位置追蹤失效、websocket 預設翻轉、設定顯隱錯亂——18 個呼叫點全部靜默降級，無其他測試會發現（party review 的第一號 blocking 復發） |
+| T1-b | `APPLICATION_IDS` 恰好 2 筆、與本 edition 相符、**無跨 edition 洩漏** | `onVariants` 覆寫或產生器被改壞 → NFC tag 指錯 app／onprem 帶入 homecloud id——`NFCUtil` 無任何測試會攔截 |
+
+成本：1 檔約 40 行、2 個測試方法；跑在既有 CI task 內，零新基礎設施。
+
+### 10.3 明確不做（及理由）
+
+| 項目 | 不做的理由 |
+|---|---|
+| IS_FULL 各消費點的行為測試（LocationTrackingSupport、Websocket 預設…） | 消費點直讀 BuildConfig，T1-a 已釘住根源；逐點測是測 Hilt provider 的樣板 |
+| Layer 2 組裝層儀器測試（Hilt `@TestInstallIn`＋MockWebServer 假 PaaS） | 組裝層剛經手動 E2E 驗證；迴歸防線由 M1–M7 release checklist 承擔。**觸發條件（F4）**：cloud 功能進入頻繁迭代、或手測第二次抓到組裝層迴歸時啟動 |
+| Layer 3 真 server E2E 自動化 | 前置未齊（CF-Access bypass、測試租戶配額）；設計已存檔於 PR 討論——三層架構、409 重用、HTTP 完成授權、絕不進 PR CI |
+| cloud screenshot goldens | 平台紀律：須由 ubuntu-latest 產生（fork-divergence.md 已載），等 cloud 驗證加入 gate 時一併 |
+| 其餘 10 條既有 ignore rule 的測試、`WoowPaasConfig` 讀值測試 | 既有債務與樣板，與「不搞壞既有功能」無關 |
+
 ## 附錄：調查指令備忘
 
 ```bash
