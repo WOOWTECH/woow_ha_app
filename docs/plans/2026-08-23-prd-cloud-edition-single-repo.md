@@ -564,6 +564,17 @@ Layer 2 守組裝、Layer 3 守「真實世界還跟我們想的一樣」。每�
 負載，這就是「全自動又不塞爆 server」的核心手段。位置：
 `app/src/androidTestCloud/`（flavor-scoped androidTest source set）。
 
+**Fixture 鐵律（2026-08-26 增補）：mock 回應禁止手寫，必須從真實流量
+錄製（record-replay）。** 沒有 API 文檔的情況下，手寫 fixture 等於把
+「我們的想像」當成契約來測——mock 只會重複你教它的話。錄製程序：以
+測試帳號用 curl 走完整條流程，逐端點存下真實回應原文為 fixture 檔
+（`androidTestCloud/assets/paas-fixtures/`），必須涵蓋當前**未經觀測**的
+三塊：409 body（對既有實例再 provision 一次即得）、denied 錯誤 body
+（瀏覽器按一次拒絕）、refresh rotation 行為。已被真實 E2E 間接驗證的
+happy path（device_authorization／token／provision／status）同樣以錄製
+原文取代現有測試裡手寫的 JSON。fixture 檔頭註記錄製日期與環境；後端
+契約若改，Layer 3 nightly 是偵測層，重錄 fixture 是修復程序。
+
 必要測試恰好兩條——只放「組裝層獨有、Layer 1 原理上測不到」的價值：
 
 | # | 測試 | 為什麼非它不可 |
@@ -597,6 +608,7 @@ Layer 2 守組裝、Layer 3 守「真實世界還跟我們想的一樣」。每�
 | P1 | CF-Access：stg 的 `/oauth2/*`、`/api/ha-paas/*` 對 CI 放行（service token 或路徑 bypass） | PaaS／infra |
 | P2 | 專用測試帳號＋**實例配額 1**（quota 鎖死在後端） | PaaS |
 | P3 | 確認授權步驟可純 HTTP 完成（登入 API＋approve API）；若 approve 無 API 則請 PaaS 補 | PaaS |
+| P4 | **PaaS API 契約文檔**（OpenAPI spec 或至少各端點的請求／回應格式與錯誤碼表）。這是 fixture 與 DTO 的唯一真相來源——目前 app 的 DTO 是前開發者在無文檔下逆向的，其中 409 body、錯誤格式、refresh rotation 均未經真實觀測。**P4 不擋 Layer 2 動工**（錄製的真實流量可先頂替），但文檔到位後須與 fixture 對帳一次 | PaaS |
 
 ### 10.4 明確不做（及理由）
 
