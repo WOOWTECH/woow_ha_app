@@ -629,6 +629,35 @@ happy path（device_authorization／token／provision／status）同樣以錄製
 | Layer 2（infra＋L2-1＋L2-2＋CI lane） | 獨立 PR，緊接本 PR 之後 | 無外部依賴 |
 | Layer 3（workflow＋real-env harness） | 獨立 PR | P1–P3 齊備後 |
 
+## 11. 實作狀態記錄（2026-08-29 盤點）
+
+### 已完成（全部在 PR #7，branch `feature/cloud-edition`，CI 全綠）
+
+| 項目 | 狀態 | 證據 |
+|---|---|---|
+| Edition flavor dimension（8 個 :app variant） | ✅ | `AndroidEditionFlavorConventionPlugin.kt`，onprem/cloud 兩版 APK 皆可組建 |
+| `BuildConfig.FLAVOR` → `IS_FULL` 改寫（18 處） | ✅ | §5.5 |
+| Hook 1（`editionStartDestination()`/`editionScreens()`） | ✅ | `OnboardingNavigation.kt` ~5 行 |
+| Hook 2（`ServerRegisteredListener` seam＋cloud 清理） | ✅ | `NameYourDeviceViewModel.kt`＋`CloudSessionCleanupListener` |
+| `:cloud-data` 模組移植（WoowPaas 資料層，110 tests） | ✅ | D6 |
+| Cloud 三畫面移植（chooser／sign-in／provision） | ✅ | `app/src/cloud/` |
+| CI workflow 全 variant 改名、automotive、screenshot | ✅ | 18/18 check-runs 綠 |
+| Hook 2 補測試（5 條，取代 cloud repo 的直接注入測試） | ✅ | `ff908cc1` |
+| 真機 E2E 驗證（release/R8 APK 打 prod，開通到活的 HA 實例） | ✅ | 2026-08-26 手動驗證，Device Flow → 開通 ~3 分鐘 → dashboard |
+| §10 測試 PRD（三層、fixture 鐵律、P1–P4） | ✅ | `c27a478d` |
+
+### 未完成（依 §10.5 順序）
+
+| 項目 | 狀態 | 卡點 |
+|---|---|---|
+| T1 `EditionBuildConfigInvariantsTest`（進 PR #7） | ⬜ 未寫 | 無，下一步 |
+| Layer 2（fixture 錄製＋@TestInstallIn＋L2-1/L2-2＋CI lane） | ⬜ 未動工 | 需用測試帳號跑 curl 錄製真實流量 |
+| Layer 3（cloud-e2e.yml nightly） | ⬜ 未動工 | 外部前置 P1–P3（CF-Access bypass、測試帳號配額、HTTP approve API） |
+| P1–P4 給 PaaS 團隊的 ticket | ⬜ 未開 | 待 Alan 確認要不要現在開 |
+| PR #7 合併、cloud repo 封存（Phase 1） | ⬜ | 待 Alan 決定合併 |
+| Cloud screenshot goldens（ubuntu-latest 產生） | ⬜ | 併入 Layer 2 之後皆可 |
+| Follow-up issues（§9：repo 根部 49.8MB APK 移除等） | ⬜ | 開 issue 即可 |
+
 ## 附錄：調查指令備忘
 
 ```bash
