@@ -71,14 +71,15 @@ class IgnoreViolationRulesTest {
     }
 
     @Test
-    fun `Given a MIUI class outside the font package when checking thread rules then violation is not ignored`() {
-        // The miui.util.font. prefix requires the trailing package dot so it does not swallow
-        // unrelated MIUI disk reads from a differently named sibling package.
+    fun `Given a MIUI class outside miui util when checking thread rules then violation is not ignored`() {
+        // The rule deliberately covers the whole miui.util. package (see IgnoreMiuiFontDiskRead),
+        // but must not swallow MIUI disk reads from entirely different MIUI packages: that would
+        // turn a targeted exemption for system font code into a blanket pass for the vendor.
         val nearMiss = arrayOf(
             StackTraceElement("android.os.StrictMode\$AndroidBlockGuardPolicy", "onReadFromDisk", "StrictMode.java", 1666),
             StackTraceElement("libcore.io.BlockGuardOs", "access", "BlockGuardOs.java", 74),
             StackTraceElement("java.io.File", "exists", "File.java", 829),
-            StackTraceElement("miui.util.fontmanager.FontManager", "load", "FontManager.java", 42),
+            StackTraceElement("miui.securitycenter.PermissionManager", "check", "PermissionManager.java", 42),
         )
 
         assertFalse(isIgnoredByThreadPolicy(diskReadViolation(nearMiss)))

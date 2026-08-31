@@ -113,6 +113,7 @@ homeassistant-android-application = { id = "homeassistant.android.application" }
 homeassistant-android-common = { id = "homeassistant.android.common" }
 homeassistant-android-compose = { id = "homeassistant.android.compose" }
 homeassistant-android-dependencies = { id = "homeassistant.android.dependencies" }
+homeassistant-android-edition = { id = "homeassistant.android.edition" }
 homeassistant-android-flavor = { id = "homeassistant.android.flavor" }
 
 [libraries]
@@ -215,6 +216,7 @@ lint-checks = { group = "com.android.tools.lint", name = "lint-checks", version.
 lint-tests = { group = "com.android.tools.lint", name = "lint-tests", version.ref = "androidTools" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 navigation-test = { module = "androidx.navigation:navigation-testing", version.ref = "navigation-compose" }
+mockwebserver = { module = "com.squareup.okhttp3:mockwebserver3" }
 okhttp-android = { module = "com.squareup.okhttp3:okhttp-android" }
 okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp" }
 okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor" }

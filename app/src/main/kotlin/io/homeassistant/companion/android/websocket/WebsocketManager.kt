@@ -53,9 +53,7 @@ class WebsocketManager(appContext: Context, workerParams: WorkerParameters) :
         private const val SOURCE = "Websocket"
         private const val NOTIFICATION_ID = 65423
         private const val NOTIFICATION_RESTRICTED_ID = 65424
-        private val DEFAULT_WEBSOCKET_SETTING = if (BuildConfig.FLAVOR ==
-            "full"
-        ) {
+        private val DEFAULT_WEBSOCKET_SETTING = if (BuildConfig.IS_FULL) {
             WebsocketSetting.NEVER
         } else {
             WebsocketSetting.ALWAYS

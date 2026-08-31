@@ -12,6 +12,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.onboarding.BaseOnboardingNavigationTest
+import io.homeassistant.companion.android.onboarding.assumeOnboardingStartsAtWelcome
 import io.homeassistant.companion.android.onboarding.connection.CONNECTION_SCREEN_TAG
 import io.homeassistant.companion.android.onboarding.welcome.navigation.WelcomeRoute
 import io.homeassistant.companion.android.testing.unit.stringResource
@@ -43,6 +44,7 @@ internal class ConnectionNavigationTest : BaseOnboardingNavigationTest() {
 
     @Test
     fun `Given clicking on connect button with server to onboard when starting the onboarding then show Connection screen then back goes to Welcome`() {
+        assumeOnboardingStartsAtWelcome()
         testNavigation("http://homeassistant.local") {
             onNodeWithText(stringResource(commonR.string.welcome_connect_to_ha))
                 .assertIsDisplayed()

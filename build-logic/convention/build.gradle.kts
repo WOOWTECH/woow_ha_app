@@ -65,6 +65,10 @@ gradlePlugin {
             id = libs.plugins.homeassistant.android.flavor.get().pluginId
             implementationClass = "AndroidFullMinimalFlavorConventionPlugin"
         }
+        register("androidApplicationEditionFlavor") {
+            id = libs.plugins.homeassistant.android.edition.get().pluginId
+            implementationClass = "AndroidEditionFlavorConventionPlugin"
+        }
         register("androidCommon") {
             id = libs.plugins.homeassistant.android.common.get().pluginId
             implementationClass = "AndroidCommonConventionPlugin"

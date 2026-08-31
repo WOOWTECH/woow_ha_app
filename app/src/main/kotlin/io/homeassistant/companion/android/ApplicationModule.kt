@@ -49,7 +49,7 @@ object ApplicationModule {
     @Singleton
     @LocationTrackingSupport
     fun providesLocationTrackingSupport(): Boolean {
-        return BuildConfig.FLAVOR == "full"
+        return BuildConfig.IS_FULL
     }
 
     @Provides

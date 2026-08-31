@@ -275,7 +275,7 @@ class SettingsFragment(private val presenter: SettingsPresenter, private val lan
             }
         }
 
-        if (BuildConfig.FLAVOR == "full") {
+        if (BuildConfig.IS_FULL) {
             findPreference<Preference>("notification_rate_limit")?.let {
                 lifecycleScope.launch(Dispatchers.Main) {
                     // Runs in IO Dispatcher
@@ -310,7 +310,7 @@ class SettingsFragment(private val presenter: SettingsPresenter, private val lan
             }
         }
         findPreference<SwitchPreference>("crash_reporting")?.let {
-            it.isVisible = BuildConfig.FLAVOR == "full"
+            it.isVisible = BuildConfig.IS_FULL
         }
 
         lifecycleScope.launch {
@@ -377,7 +377,7 @@ class SettingsFragment(private val presenter: SettingsPresenter, private val lan
         findPreference<PreferenceCategory>("android_auto")?.let {
             it.isVisible =
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-                (BuildConfig.FLAVOR == "full" || isAutomotive)
+                (BuildConfig.IS_FULL || isAutomotive)
             if (isAutomotive) {
                 it.title = getString(commonR.string.android_automotive)
             }

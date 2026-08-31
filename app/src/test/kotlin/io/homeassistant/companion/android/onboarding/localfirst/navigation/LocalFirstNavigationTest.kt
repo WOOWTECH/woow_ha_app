@@ -8,6 +8,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.onboarding.BaseOnboardingNavigationTest
+import io.homeassistant.companion.android.onboarding.assumeOnboardingStartsAtWelcome
 import io.homeassistant.companion.android.onboarding.locationforsecureconnection.navigation.LocationForSecureConnectionRoute
 import io.homeassistant.companion.android.onboarding.locationsharing.navigation.LocationSharingRoute
 import io.homeassistant.companion.android.onboarding.welcome.navigation.WelcomeRoute
@@ -28,6 +29,7 @@ internal class LocalFirstNavigationTest : BaseOnboardingNavigationTest() {
 
     @Test
     fun `Given LocalFirst when pressing next then show LocationSharing then goes back stop the app`() {
+        assumeOnboardingStartsAtWelcome()
         testNavigation {
             navController.navigateToLocalFirst(42, true)
             assertTrue(navController.currentBackStackEntry?.destination?.hasRoute<LocalFirstRoute>() == true)

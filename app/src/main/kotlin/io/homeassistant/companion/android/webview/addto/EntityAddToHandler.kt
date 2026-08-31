@@ -56,7 +56,7 @@ class EntityAddToHandler @Inject constructor(
      */
     suspend fun actionsForEntity(context: Context, entityId: String): List<EntityAddToAction> {
         return actionsForEntity(
-            isFullFlavor = BuildConfig.FLAVOR == "full",
+            isFullFlavor = BuildConfig.IS_FULL,
             isAutomotive = context.isAutomotive(),
             isQuest = QuestUtil.isQuest,
             entityId,

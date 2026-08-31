@@ -22,6 +22,7 @@ import io.homeassistant.companion.android.common.data.HomeAssistantVersion
 import io.homeassistant.companion.android.common.data.connectivity.ConnectivityCheckState
 import io.homeassistant.companion.android.onboarding.BaseOnboardingNavigationTest
 import io.homeassistant.companion.android.onboarding.URL_GETTING_STARTED_DOCUMENTATION
+import io.homeassistant.companion.android.onboarding.assumeOnboardingStartsAtWelcome
 import io.homeassistant.companion.android.onboarding.connection.CONNECTION_SCREEN_TAG
 import io.homeassistant.companion.android.onboarding.connection.ConnectionNavigationEvent
 import io.homeassistant.companion.android.onboarding.connection.ConnectionViewModel
@@ -92,6 +93,7 @@ internal class ServerDiscoveryNavigationTest : BaseOnboardingNavigationTest() {
 
     @Test
     fun `Given clicking on connect button when starting the onboarding then show ServerDiscovery then back goes to Welcome`() {
+        assumeOnboardingStartsAtWelcome()
         testNavigation {
             onNodeWithText(stringResource(commonR.string.welcome_connect_to_ha))
                 .assertIsDisplayed()
@@ -110,6 +112,7 @@ internal class ServerDiscoveryNavigationTest : BaseOnboardingNavigationTest() {
 
     @Test
     fun `Given clicking on connect button with hide existing server and no server to onboard when starting the onboarding then show Discovery screen with existing server hidden then back goes to Welcome`() {
+        assumeOnboardingStartsAtWelcome()
         testNavigation(hideExistingServers = true) {
             onNodeWithText(stringResource(commonR.string.welcome_connect_to_ha))
                 .assertIsDisplayed()

@@ -87,7 +87,7 @@ internal class LaunchViewModel @VisibleForTesting constructor(
         networkStatusMonitor,
         hasLocationTrackingSupport,
         isAutomotive = isAutomotive,
-        isFullFlavor = BuildConfig.FLAVOR == "full",
+        isFullFlavor = BuildConfig.IS_FULL,
     )
 
     /**

@@ -1,10 +1,17 @@
 plugins {
     alias(libs.plugins.homeassistant.android.application)
     alias(libs.plugins.homeassistant.android.flavor)
+    alias(libs.plugins.homeassistant.android.edition)
     alias(libs.plugins.firebase.appdistribution)
     alias(libs.plugins.google.services)
     alias(libs.plugins.homeassistant.android.dependencies)
     alias(libs.plugins.kotlin.parcelize)
+}
+
+dependencies {
+    // The WOOW PaaS data layer only exists on cloud variants; on-premise APKs must not even
+    // contain the endpoint strings. See docs/plans/2026-08-23-prd-cloud-edition-single-repo.md.
+    "cloudImplementation"(project(":cloud-data"))
 }
 
 android {

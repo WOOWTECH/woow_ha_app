@@ -58,9 +58,7 @@ fun WebsocketSettingView(
             Divider()
             RadioButtonRow(
                 text = stringResource(
-                    if (BuildConfig.FLAVOR ==
-                        "full"
-                    ) {
+                    if (BuildConfig.IS_FULL) {
                         R.string.websocket_setting_never
                     } else {
                         R.string.websocket_setting_never_minimal
@@ -72,9 +70,7 @@ fun WebsocketSettingView(
             if (hasWifi) {
                 RadioButtonRow(
                     text = stringResource(
-                        if (BuildConfig.FLAVOR ==
-                            "full"
-                        ) {
+                        if (BuildConfig.IS_FULL) {
                             R.string.websocket_setting_home_wifi
                         } else {
                             R.string.websocket_setting_home_wifi_minimal
@@ -86,9 +82,7 @@ fun WebsocketSettingView(
             }
             RadioButtonRow(
                 text = stringResource(
-                    if (BuildConfig.FLAVOR ==
-                        "full"
-                    ) {
+                    if (BuildConfig.IS_FULL) {
                         R.string.websocket_setting_while_screen_on
                     } else {
                         R.string.websocket_setting_while_screen_on_minimal
@@ -99,9 +93,7 @@ fun WebsocketSettingView(
             )
             RadioButtonRow(
                 text = stringResource(
-                    if (BuildConfig.FLAVOR ==
-                        "full"
-                    ) {
+                    if (BuildConfig.IS_FULL) {
                         R.string.websocket_setting_always
                     } else {
                         R.string.websocket_setting_always_minimal

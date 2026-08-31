@@ -12,8 +12,12 @@ This project is entirely made with Kotlin and it should stay like this.
 ### Building the App
 
 ```bash
-# Debug build (full and minimal)
+# Debug build (all variants: version x edition, e.g. fullOnprem / fullCloud)
 ./gradlew assembleDebug
+
+# Single-variant examples
+./gradlew :app:assembleFullOnpremDebug   # on-premise (com.woowtech.home)
+./gradlew :app:assembleFullCloudDebug    # cloud (com.woowtech.homecloud)
 
 # Run all tests
 ./gradlew test
@@ -56,8 +60,8 @@ Whenever you add or update dependencies in the project (whether through `gradle/
 # Run unit tests
 ./gradlew test
 
-# Run screenshot tests
-./gradlew validateDebugScreenshotTest
+# Run screenshot tests (:app tasks are per edition+flavor since the edition dimension)
+./gradlew :common:validateDebugScreenshotTest :app:validateFullOnpremDebugScreenshotTest
 ```
 
 ## Architecture
