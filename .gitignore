@@ -377,4 +377,5 @@ _test/
 
 # Local AI-tooling session artifacts (never commit)
 .playwright-mcp/
+.claude/
 .superpowers/
