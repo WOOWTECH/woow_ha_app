@@ -10,6 +10,7 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.annotation.VisibleForTesting
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import io.homeassistant.companion.android.common.util.instant
 import io.homeassistant.companion.android.database.sensor.SensorSetting
@@ -60,7 +61,7 @@ class GeocodeSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#geocoded-location-sensor"
+        return "${AppSupportLinks.SENSORS}#geocoded-location-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_geolocation

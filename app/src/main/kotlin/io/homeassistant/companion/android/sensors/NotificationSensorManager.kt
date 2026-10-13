@@ -16,6 +16,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNAVAILABLE
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import io.homeassistant.companion.android.common.util.isAutomotive
@@ -40,7 +41,7 @@ class NotificationSensorManager :
             commonR.string.basic_sensor_name_last_notification,
             commonR.string.sensor_description_last_notification,
             "mdi:bell-ring",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#last-notification",
+            docsLink = "${AppSupportLinks.SENSORS}#last-notification",
             updateType = SensorManager.BasicSensor.UpdateType.INTENT_ONLY,
         )
         val lastRemovedNotification = SensorManager.BasicSensor(
@@ -49,7 +50,7 @@ class NotificationSensorManager :
             commonR.string.basic_sensor_name_last_removed_notification,
             commonR.string.sensor_description_last_removed_notification,
             "mdi:bell-ring",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#last-removed-notification",
+            docsLink = "${AppSupportLinks.SENSORS}#last-removed-notification",
             updateType = SensorManager.BasicSensor.UpdateType.INTENT_ONLY,
         )
         val activeNotificationCount = SensorManager.BasicSensor(
@@ -59,7 +60,7 @@ class NotificationSensorManager :
             commonR.string.sensor_description_active_notification_count,
             "mdi:bell-ring",
             unitOfMeasurement = "notifications",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#active-notification-count",
+            docsLink = "${AppSupportLinks.SENSORS}#active-notification-count",
             stateClass = SensorManager.STATE_CLASS_MEASUREMENT,
             updateType = SensorManager.BasicSensor.UpdateType.INTENT,
         )
@@ -70,12 +71,12 @@ class NotificationSensorManager :
             commonR.string.sensor_description_media_session,
             "mdi:play-circle",
             deviceClass = "enum",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#media-session-sensor",
+            docsLink = "${AppSupportLinks.SENSORS}#media-session-sensor",
         )
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#notification-sensors"
+        return "${AppSupportLinks.SENSORS}#notification-sensors"
     }
     override fun hasSensor(context: Context): Boolean {
         return if (!context.isAutomotive()) {

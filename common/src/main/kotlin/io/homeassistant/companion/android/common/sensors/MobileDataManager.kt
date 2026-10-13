@@ -9,6 +9,7 @@ import android.provider.Settings.Global.getInt
 import android.telephony.TelephonyManager
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 
 class MobileDataManager : SensorManager {
 
@@ -32,7 +33,7 @@ class MobileDataManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#mobile-data-sensors"
+        return "${AppSupportLinks.SENSORS}#mobile-data-sensors"
     }
 
     override val name: Int

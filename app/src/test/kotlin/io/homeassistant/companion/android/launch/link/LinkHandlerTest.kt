@@ -77,7 +77,7 @@ class LinkHandlerTest {
             caughtException = exception
         }
 
-        val uri = "homeassistant://helloworld".toUri()
+        val uri = "woowtech://helloworld".toUri()
         val result = handler.handleLink(uri)
         assertEquals(LinkDestination.NoDestination, result)
         assertNotNull(caughtException)
@@ -94,8 +94,21 @@ class LinkHandlerTest {
     }
 
     @Test
+    fun `Given valid invite URI without trailing slash when invoking handleLink then returns Onboarding with provided URL`() = runTest {
+        // ⚠️ 不帶斜線的 `/invite` 是**三個地方都明著宣告支援**的形式:
+        //    AndroidManifest 的 intent-filter、品牌站的 apple-app-site-association,
+        //    以及 iOS 的 IncomingURLHandler(`["/invite", "/invite/"].contains(...)`)。
+        //    這個檔案自己的 KDoc 範例用的也是不帶斜線的形式。
+        //    在此之前所有 invite 測試都只用 `/invite/`,所以 Android 收不下 `/invite`
+        //    這件事一路沒被抓到——實機打開會落到 "Unknown or invalid universal link"。
+        val uri = "https://aiot.woowtech.io/invite#url=http://homeassistant.local:8123".toUri()
+        val result = handler.handleLink(uri)
+        assertEquals(LinkDestination.Onboarding("http://homeassistant.local:8123"), result)
+    }
+
+    @Test
     fun `Given valid invite deep link with URL when invoking handleLink then returns Onboarding with provided URL`() = runTest {
-        val uri = "homeassistant://invite/toto#url=http://homeassistant.local:8123".toUri()
+        val uri = "woowtech://invite/toto#url=http://homeassistant.local:8123".toUri()
         val result = handler.handleLink(uri)
         assertEquals(LinkDestination.Onboarding("http://homeassistant.local:8123"), result)
     }
@@ -180,7 +193,7 @@ class LinkHandlerTest {
     fun `Given navigate deep link with no registered server when invoking handleLink then returns NoDestination`() = runTest {
         coEvery { serverManager.isRegistered() } returns false
 
-        val uri = "homeassistant://navigate/lovelace/dashboard".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard".toUri()
         val result = handler.handleLink(uri)
 
         assertEquals(LinkDestination.NoDestination, result)
@@ -193,10 +206,10 @@ class LinkHandlerTest {
             coEvery { id } returns 1
         }
 
-        val uri = "homeassistant://navigate/lovelace/dashboard".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard".toUri()
         val result = handler.handleLink(uri)
 
-        assertEquals(LinkDestination.Webview("homeassistant://navigate/lovelace/dashboard", 1), result)
+        assertEquals(LinkDestination.Webview("woowtech://navigate/lovelace/dashboard", 1), result)
     }
 
     @Test
@@ -206,10 +219,10 @@ class LinkHandlerTest {
             coEvery { id } returns 1
         }
 
-        val uri = "homeassistant://navigate/lovelace/dashboard?server=default".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard?server=default".toUri()
         val result = handler.handleLink(uri)
 
-        assertEquals(LinkDestination.Webview("homeassistant://navigate/lovelace/dashboard?server=default", 1), result)
+        assertEquals(LinkDestination.Webview("woowtech://navigate/lovelace/dashboard?server=default", 1), result)
     }
 
     @Test
@@ -219,10 +232,10 @@ class LinkHandlerTest {
             coEvery { id } returns 1
         }
 
-        val uri = "homeassistant://navigate/lovelace/dashboard?server=".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard?server=".toUri()
         val result = handler.handleLink(uri)
 
-        assertEquals(LinkDestination.Webview("homeassistant://navigate/lovelace/dashboard?server=", 1), result)
+        assertEquals(LinkDestination.Webview("woowtech://navigate/lovelace/dashboard?server=", 1), result)
     }
 
     @Test
@@ -239,10 +252,10 @@ class LinkHandlerTest {
             },
         )
 
-        val uri = "homeassistant://navigate/lovelace/dashboard?server=Office".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard?server=Office".toUri()
         val result = handler.handleLink(uri)
 
-        assertEquals(LinkDestination.Webview("homeassistant://navigate/lovelace/dashboard?server=Office", 2), result)
+        assertEquals(LinkDestination.Webview("woowtech://navigate/lovelace/dashboard?server=Office", 2), result)
     }
 
     @Test
@@ -259,10 +272,10 @@ class LinkHandlerTest {
             },
         )
 
-        val uri = "homeassistant://navigate/lovelace/dashboard?server=office".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard?server=office".toUri()
         val result = handler.handleLink(uri)
 
-        assertEquals(LinkDestination.Webview("homeassistant://navigate/lovelace/dashboard?server=office", 2), result)
+        assertEquals(LinkDestination.Webview("woowtech://navigate/lovelace/dashboard?server=office", 2), result)
     }
 
     @Test
@@ -275,10 +288,10 @@ class LinkHandlerTest {
             },
         )
 
-        val uri = "homeassistant://navigate/lovelace/dashboard?server=NonExisting".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard?server=NonExisting".toUri()
         val result = handler.handleLink(uri)
 
-        assertEquals(LinkDestination.Webview("homeassistant://navigate/lovelace/dashboard?server=NonExisting", ServerManager.SERVER_ID_ACTIVE), result)
+        assertEquals(LinkDestination.Webview("woowtech://navigate/lovelace/dashboard?server=NonExisting", ServerManager.SERVER_ID_ACTIVE), result)
     }
 
     /*
@@ -321,10 +334,10 @@ class LinkHandlerTest {
             },
         )
 
-        val uri = "homeassistant://navigate/lovelace/dashboard?server=NonExisting".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard?server=NonExisting".toUri()
         val result = handler.handleLink(uri)
 
-        assertEquals(LinkDestination.ServerPicker("homeassistant://navigate/lovelace/dashboard?server=NonExisting"), result)
+        assertEquals(LinkDestination.ServerPicker("woowtech://navigate/lovelace/dashboard?server=NonExisting"), result)
     }
 
     @Test
@@ -342,9 +355,9 @@ class LinkHandlerTest {
             },
         )
 
-        val uri = "homeassistant://navigate/lovelace/dashboard".toUri()
+        val uri = "woowtech://navigate/lovelace/dashboard".toUri()
         val result = handler.handleLink(uri)
 
-        assertEquals(LinkDestination.ServerPicker("homeassistant://navigate/lovelace/dashboard"), result)
+        assertEquals(LinkDestination.ServerPicker("woowtech://navigate/lovelace/dashboard"), result)
     }
 }

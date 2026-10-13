@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.SystemClock
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNAVAILABLE
 import io.homeassistant.companion.android.database.sensor.SensorSetting
 import io.homeassistant.companion.android.database.sensor.SensorSettingType
@@ -34,7 +35,7 @@ class LastRebootSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#last-reboot-sensor"
+        return "${AppSupportLinks.SENSORS}#last-reboot-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_last_reboot

@@ -8,6 +8,7 @@ import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.data.servers.ServerManager
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -20,6 +21,7 @@ class WearOnboardingListener : WearableListenerService() {
     lateinit var serverManager: ServerManager
 
     override fun onMessageReceived(event: MessageEvent) {
+        if (!PhoneIntegrationReleasePolicy.wearSetupEnabled) return
         Timber.d("onMessageReceived: $event")
 
         if (event.path == "/request_home_assistant_instance") {

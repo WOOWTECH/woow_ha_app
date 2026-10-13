@@ -7,6 +7,7 @@ import androidx.core.graphics.red
 import com.google.android.material.color.DynamicColors
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 
 class DynamicColorSensorManager : SensorManager {
     companion object {
@@ -21,7 +22,7 @@ class DynamicColorSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#dynamic-color-sensor"
+        return "${AppSupportLinks.SENSORS}#dynamic-color-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_dynamic_color

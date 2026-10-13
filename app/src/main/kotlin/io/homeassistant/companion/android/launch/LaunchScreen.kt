@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.compose.theme.LocalHAColorScheme
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 
 @Composable
 fun NetworkUnavailableDialog(onBackClick: () -> Unit) {
@@ -20,7 +21,13 @@ fun NetworkUnavailableDialog(onBackClick: () -> Unit) {
 fun WearUnsupportedDialog(onBackClick: () -> Unit) {
     ErrorDialog(
         title = stringResource(commonR.string.wear_unsupported_title),
-        content = stringResource(commonR.string.wear_unsupported_message),
+        content = stringResource(
+            if (PhoneIntegrationReleasePolicy.wearSetupEnabled) {
+                commonR.string.wear_unsupported_message
+            } else {
+                commonR.string.phone_integration_unavailable
+            },
+        ),
         onBackClick = onBackClick,
     )
 }

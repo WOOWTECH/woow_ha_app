@@ -20,6 +20,11 @@ android {
         buildConfigField("String", "VERSION_NAME", "\"$versionName-$versionCode\"")
     }
 
+    testOptions {
+        // Library test APKs otherwise inherit minSdk as their target SDK.
+        targetSdk = libs.versions.androidSdk.target.get().toInt()
+    }
+
     sourceSets {
         // Adds exported schema location as test app assets.
         getByName("androidTest").assets.srcDirs("$projectDir/schemas")

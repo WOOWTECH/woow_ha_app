@@ -287,8 +287,10 @@ class MessagingManager @Inject constructor(
                     val dbData: Map<String, String> = kotlinJsonMapper.decodeFromString(it.data)
 
                     now = it.received // Allow for updating the existing notification without a tag
-                    jsonData = jsonData + dbData // Add the notificationData, this contains the reply text
-                } ?: return@launch
+                    jsonData = dbData + jsonData // Preserve new reply data over the stored notification
+                }
+                // A still-visible notification may outlive its retained history row. In that case the
+                // receiver supplies the original notification data so actions and replies keep working.
             } else {
                 val jsonObject = jsonData.toJsonObject()
                 val receivedServer = jsonData[NotificationData.WEBHOOK_ID]?.let {

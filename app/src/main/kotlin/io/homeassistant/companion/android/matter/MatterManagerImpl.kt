@@ -7,8 +7,7 @@ import javax.inject.Inject
 
 class MatterManagerImpl @Inject constructor() : MatterManager {
 
-    // Matter support currently depends on Google Play Services,
-    // and as a result Matter is not supported with the minimal flavor
+    // This product does not expose Matter support, including in the full Google/FCM build.
 
     override fun appSupportsCommissioning(): Boolean = false
 
@@ -23,7 +22,7 @@ class MatterManagerImpl @Inject constructor() : MatterManager {
         onSuccess: (IntentSender) -> Unit,
         onFailure: (Exception) -> Unit,
     ) {
-        onFailure(IllegalStateException("Matter commissioning is not supported with the minimal flavor"))
+        onFailure(IllegalStateException("Matter commissioning is not supported in woowtech aiot"))
     }
 
     override suspend fun commissionDevice(code: String, serverId: Int): MatterCommissionResponse? = null

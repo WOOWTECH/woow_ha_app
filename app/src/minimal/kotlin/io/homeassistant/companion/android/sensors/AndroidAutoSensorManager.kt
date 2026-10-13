@@ -3,8 +3,12 @@ package io.homeassistant.companion.android.sensors
 import android.content.Context
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 
 class AndroidAutoSensorManager : SensorManager {
+
+    override val enabledByRelease: Boolean
+        get() = PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled
 
     override val name: Int
         get() = commonR.string.sensor_name_android_auto

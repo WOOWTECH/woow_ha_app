@@ -19,6 +19,7 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.data.network.WifiHelper
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.isIgnoringBatteryOptimizations
 import io.homeassistant.companion.android.settings.SettingViewModel
 import io.homeassistant.companion.android.settings.SettingViewModel.Companion.DEFAULT_WEBSOCKET_SETTING
@@ -81,7 +82,7 @@ class WebsocketSettingFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://aiot.woowtech.io/docs/notifications/notification-local")
+        addHelpMenuProvider(AppSupportLinks.LOCAL_PUSH)
     }
 
     override fun onResume() {

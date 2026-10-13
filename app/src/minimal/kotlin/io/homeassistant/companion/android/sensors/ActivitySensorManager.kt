@@ -5,10 +5,16 @@ import android.content.Context
 import android.content.Intent
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 
 class ActivitySensorManager :
     BroadcastReceiver(),
     SensorManager {
+
+    override val enabledByRelease: Boolean
+        get() = PhoneIntegrationReleasePolicy.fitnessSensorsEnabled
+
+    override fun hasSensor(context: Context): Boolean = enabledByRelease
 
     override fun onReceive(context: Context, intent: Intent) {
         // Noop

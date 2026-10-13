@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager.SENSOR_DELAY_NORMAL
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,7 @@ class LightSensorManager :
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#light-sensor"
+        return "${AppSupportLinks.SENSORS}#light-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_light

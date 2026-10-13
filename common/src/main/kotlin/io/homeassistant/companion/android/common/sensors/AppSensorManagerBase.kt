@@ -9,6 +9,7 @@ import android.os.Process
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import java.math.RoundingMode
 import timber.log.Timber
 
@@ -22,7 +23,7 @@ abstract class AppSensorManagerBase : SensorManager {
             commonR.string.basic_sensor_name_current_version,
             commonR.string.sensor_description_current_version,
             "mdi:android",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#current-version-sensor",
+            docsLink = "${AppSupportLinks.SENSORS}#current-version-sensor",
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
         )
 
@@ -33,7 +34,7 @@ abstract class AppSensorManagerBase : SensorManager {
             commonR.string.sensor_description_app_rx_gb,
             "mdi:radio-tower",
             unitOfMeasurement = "GB",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#app-data-sensors",
+            docsLink = "${AppSupportLinks.SENSORS}#app-data-sensors",
             stateClass = SensorManager.STATE_CLASS_TOTAL_INCREASING,
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
         )
@@ -45,7 +46,7 @@ abstract class AppSensorManagerBase : SensorManager {
             commonR.string.sensor_description_app_tx_gb,
             "mdi:radio-tower",
             unitOfMeasurement = "GB",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#app-data-sensors",
+            docsLink = "${AppSupportLinks.SENSORS}#app-data-sensors",
             stateClass = SensorManager.STATE_CLASS_TOTAL_INCREASING,
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
         )
@@ -57,7 +58,7 @@ abstract class AppSensorManagerBase : SensorManager {
             commonR.string.sensor_description_app_memory,
             "mdi:memory",
             unitOfMeasurement = "GB",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#app-memory-sensor",
+            docsLink = "${AppSupportLinks.SENSORS}#app-memory-sensor",
             stateClass = SensorManager.STATE_CLASS_MEASUREMENT,
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
         )
@@ -68,7 +69,7 @@ abstract class AppSensorManagerBase : SensorManager {
             commonR.string.basic_sensor_name_app_inactive,
             commonR.string.sensor_description_app_inactive,
             "mdi:timer-outline",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#app-usage-sensors",
+            docsLink = "${AppSupportLinks.SENSORS}#app-usage-sensors",
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
         )
 
@@ -79,7 +80,7 @@ abstract class AppSensorManagerBase : SensorManager {
             commonR.string.sensor_description_app_standby,
             "mdi:android",
             deviceClass = "enum",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#app-usage-sensors",
+            docsLink = "${AppSupportLinks.SENSORS}#app-usage-sensors",
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
         )
 
@@ -90,7 +91,7 @@ abstract class AppSensorManagerBase : SensorManager {
             commonR.string.sensor_description_app_importance,
             "mdi:android",
             deviceClass = "enum",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#app-importance-sensor",
+            docsLink = "${AppSupportLinks.SENSORS}#app-importance-sensor",
             entityCategory = SensorManager.ENTITY_CATEGORY_DIAGNOSTIC,
         )
     }

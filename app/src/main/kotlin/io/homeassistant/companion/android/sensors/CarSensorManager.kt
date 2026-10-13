@@ -18,6 +18,7 @@ import io.homeassistant.companion.android.common.sensors.SensorManager
 import io.homeassistant.companion.android.common.util.STATE_UNAVAILABLE
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import io.homeassistant.companion.android.common.util.isAutomotive
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import io.homeassistant.companion.android.vehicle.HaCarAppService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -267,10 +268,14 @@ class CarSensorManager :
         EnergyProfile.EVCONNECTOR_TYPE_UNKNOWN to STATE_UNKNOWN,
     )
 
+    override val enabledByRelease: Boolean
+        get() = PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled
+
     override val name: Int
         get() = R.string.sensor_name_car
 
     override suspend fun getAvailableSensors(context: Context): List<SensorManager.BasicSensor> {
+        if (!enabledByRelease) return emptyList()
         this.latestContext = context.applicationContext
 
         return if (areCarSensorApisAvailable) {
@@ -282,12 +287,14 @@ class CarSensorManager :
 
     @Suppress("KotlinConstantConditions")
     override fun hasSensor(context: Context): Boolean {
+        if (!enabledByRelease) return false
         this.latestContext = context.applicationContext
 
         return isAutomotive || (areCarSensorApisAvailable && BuildConfig.FLAVOR == "full")
     }
 
     override fun requiredPermissions(context: Context, sensorId: String): Array<String> {
+        if (!enabledByRelease) return emptyArray()
         return carSensorsList.firstOrNull { it.sensor.id == sensorId }?.let {
             if (isAutomotive) {
                 it.automotivePermissions.toTypedArray()
@@ -298,6 +305,7 @@ class CarSensorManager :
     }
 
     suspend fun isEnabled(context: Context, carSensor: CarSensor): Boolean {
+        if (!enabledByRelease) return false
         this.latestContext = context.applicationContext
 
         if ((isAutomotive && !carSensor.automotiveEnabled) || (!isAutomotive && !carSensor.autoEnabled)) {
@@ -308,6 +316,7 @@ class CarSensorManager :
     }
 
     override suspend fun requestSensorUpdate(context: Context) {
+        if (!enabledByRelease) return
         this.latestContext = context.applicationContext
 
         if (allDisabled()) {

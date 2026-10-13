@@ -14,6 +14,7 @@ import io.homeassistant.companion.android.common.data.servers.ServerManager
 import io.homeassistant.companion.android.common.util.FailFast
 import io.homeassistant.companion.android.database.server.Server
 import io.homeassistant.companion.android.testing.unit.ConsoleLogExtension
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import io.homeassistant.companion.android.widgets.camera.CameraWidgetConfigureActivity
 import io.homeassistant.companion.android.widgets.entity.EntityWidgetConfigureActivity
 import io.homeassistant.companion.android.widgets.mediaplayer.MediaPlayerControlsWidgetConfigureActivity
@@ -24,11 +25,13 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import io.mockk.verify
 import java.time.LocalDateTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,6 +54,11 @@ class EntityAddToHandlerTest {
 
     private val serverId = 42
 
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
+    }
+
     @BeforeEach
     fun setUp() {
         serverManager = mockk()
@@ -71,7 +79,20 @@ class EntityAddToHandlerTest {
     }
 
     @Test
+    fun `Given stale phone Auto favorite action when executed then preference is unchanged and unavailable is shown`() = runTest {
+        val onShowSnackbar: suspend (String, String?) -> Boolean = mockk(relaxed = true)
+        every { context.getString(commonR.string.phone_integration_unavailable) } returns "Unavailable"
+
+        handler.execute(context, EntityAddToAction.AndroidAutoFavorite, "light.test", onShowSnackbar)
+
+        coVerify(exactly = 0) { prefsRepository.addAutoFavorite(any()) }
+        coVerify { onShowSnackbar("Unavailable", null) }
+    }
+
+    @Test
     fun `Given AndroidAutoFavorite action when executing then it adds to favorite`() = runTest {
+        mockkObject(PhoneIntegrationReleasePolicy)
+        every { PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled } returns true
         val entityId = "vehicle.test"
         val action = EntityAddToAction.AndroidAutoFavorite
         val onShowSnackbar: suspend (String, String?) -> Boolean = mockk(relaxed = true)
@@ -88,6 +109,8 @@ class EntityAddToHandlerTest {
 
     @Test
     fun `Given null server when adding AndroidAutoFavorite then call FailFast and show snackbar in release`() = runTest {
+        mockkObject(PhoneIntegrationReleasePolicy)
+        every { PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled } returns true
         val entityId = "vehicle.test"
         val action = EntityAddToAction.AndroidAutoFavorite
         val onShowSnackbar: suspend (String, String?) -> Boolean = mockk(relaxed = true)
@@ -141,14 +164,14 @@ class EntityAddToHandlerTest {
     }
 
     @Test
-    fun `Given alarm_control_panel entityId on full flavor when getting actionsForEntity then returns EntityWidget and AndroidAutoFavorite`() = runTest {
+    fun `Given alarm_control_panel entityId on phone full flavor when getting actionsForEntity then returns only EntityWidget`() = runTest {
         val entityId = "alarm_control_panel.test"
 
         mockGetEntity(entityId)
 
         val actions = handler.actionsForEntity(isFullFlavor = true, isAutomotive = false, isQuest = false, entityId)
 
-        assertEquals(listOf(EntityAddToAction.EntityWidget, EntityAddToAction.AndroidAutoFavorite), actions)
+        assertEquals(listOf(EntityAddToAction.EntityWidget), actions)
     }
 
     @Test
@@ -278,6 +301,8 @@ class EntityAddToHandlerTest {
         ],
     )
     fun `Given standard entity on automotive when getting actionsForEntity then returns auto favorite`(isFullFlavor: Boolean, entityId: String) = runTest {
+        mockkObject(PhoneIntegrationReleasePolicy)
+        every { PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled } returns true
         mockGetEntity(entityId)
 
         val actions = handler.actionsForEntity(isFullFlavor = isFullFlavor, isAutomotive = true, isQuest = false, entityId)

@@ -3,6 +3,7 @@ package io.homeassistant.companion.android.common.sensors
 import android.content.Context
 import android.os.Build
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 
 class AndroidOsSensorManager : SensorManager {
@@ -27,7 +28,7 @@ class AndroidOsSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#android-os-sensors"
+        return "${AppSupportLinks.SENSORS}#android-os-sensors"
     }
 
     override val name: Int

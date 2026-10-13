@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.data.integration.ControlsAuthRequiredSetting
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.settings.addHelpMenuProvider
 import io.homeassistant.companion.android.settings.controls.views.ManageControlsView
 import io.homeassistant.companion.android.util.compose.HomeAssistantAppTheme
@@ -49,7 +50,7 @@ class ManageControlsSettingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://aiot.woowtech.io/docs/integrations/android-device-controls")
+        addHelpMenuProvider("${AppSupportLinks.SHORTCUTS}#android-device-controls")
     }
 
     override fun onResume() {

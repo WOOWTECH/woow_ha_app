@@ -12,12 +12,14 @@ import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.SleepClassifyEvent
 import com.google.android.gms.location.SleepSegmentEvent
 import com.google.android.gms.location.SleepSegmentRequest
-import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.sensors.HealthSensorReleasePolicy
 import io.homeassistant.companion.android.common.sensors.SensorManager
 import io.homeassistant.companion.android.common.sensors.SensorReceiverBase
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import io.homeassistant.companion.android.common.util.isAutomotive
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +27,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@AndroidEntryPoint
+private const val SLEEP_REQUEST_CODE = 1
+
+// No members need injection: SensorManager resolves dependencies on demand.
+// A plain receiver lets disabled Sleep events reach their guard without Hilt component setup.
 class ActivitySensorManager :
     BroadcastReceiver(),
     SensorManager {
@@ -72,10 +77,19 @@ class ActivitySensorManager :
 
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
+    override val enabledByRelease: Boolean
+        get() = PhoneIntegrationReleasePolicy.fitnessSensorsEnabled
+
     override fun onReceive(context: Context, intent: Intent) {
+        // Ignore legacy phone deliveries without even acquiring a GMS client for cleanup.
+        if (!enabledByRelease) return
         when (intent.action) {
             ACTION_UPDATE_ACTIVITY -> ioScope.launch { handleActivityUpdate(intent, context) }
-            ACTION_SLEEP_ACTIVITY -> ioScope.launch { handleSleepUpdate(intent, context) }
+            ACTION_SLEEP_ACTIVITY -> if (HealthSensorReleasePolicy.sleepSensorsEnabled) {
+                ioScope.launch { handleSleepUpdate(intent, context) }
+            } else {
+                removeDisabledSleepUpdates(context)
+            }
             else -> Timber.w("Unknown intent action: ${intent.action}!")
         }
     }
@@ -96,13 +110,14 @@ class ActivitySensorManager :
         intent.action = ACTION_SLEEP_ACTIVITY
         return PendingIntent.getBroadcast(
             context,
-            1,
+            SLEEP_REQUEST_CODE,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
         )
     }
 
     private suspend fun handleActivityUpdate(intent: Intent, context: Context) {
+        if (!enabledByRelease) return
         Timber.d("Received activity update.")
         if (ActivityRecognitionResult.hasResult(intent)) {
             val result = ActivityRecognitionResult.extractResult(intent)
@@ -128,6 +143,7 @@ class ActivitySensorManager :
     }
 
     private suspend fun handleSleepUpdate(intent: Intent, context: Context) {
+        if (!HealthSensorReleasePolicy.sleepSensorsEnabled) return
         Timber.d("Received sleep update")
         if (SleepClassifyEvent.hasEvents(intent) && isEnabled(context, sleepConfidence)) {
             Timber.d("Sleep classify event detected")
@@ -200,17 +216,24 @@ class ActivitySensorManager :
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#activity-sensors"
+        return "${AppSupportLinks.SENSORS}#activity-sensors"
     }
 
     override val name: Int
         get() = commonR.string.sensor_name_activity
 
+    override fun isSensorEnabledByRelease(sensorId: String): Boolean {
+        if (!super.isSensorEnabledByRelease(sensorId)) return false
+        return HealthSensorReleasePolicy.sleepSensorsEnabled ||
+            (sensorId != sleepConfidence.id && sensorId != sleepSegment.id)
+    }
+
     override suspend fun getAvailableSensors(context: Context): List<SensorManager.BasicSensor> {
-        return listOf(activity, sleepConfidence, sleepSegment)
+        return listOf(activity, sleepConfidence, sleepSegment).filter { isSensorEnabledByRelease(it.id) }
     }
 
     override fun requiredPermissions(context: Context, sensorId: String): Array<String> {
+        if (!isSensorEnabledByRelease(sensorId)) return emptyArray()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             arrayOf(
                 Manifest.permission.ACTIVITY_RECOGNITION,
@@ -221,10 +244,11 @@ class ActivitySensorManager :
     }
 
     override fun hasSensor(context: Context): Boolean {
-        return !context.isAutomotive()
+        return enabledByRelease && !context.isAutomotive()
     }
 
     override suspend fun requestSensorUpdate(context: Context) {
+        if (!enabledByRelease) return
         if (isEnabled(context, activity)) {
             val actReg = ActivityRecognition.getClient(context)
             val pendingIntent = getActivityPendingIntent(context)
@@ -239,6 +263,15 @@ class ActivitySensorManager :
                 Timber.e(e, "Unable to register for activity updates")
             }
         }
+        if (!HealthSensorReleasePolicy.sleepSensorsEnabled) {
+            removeDisabledSleepUpdates(context)
+            return
+        }
+        requestSleepUpdates(context)
+    }
+
+    private suspend fun requestSleepUpdates(context: Context) {
+        if (!HealthSensorReleasePolicy.sleepSensorsEnabled) return
         if ((
                 isEnabled(context, sleepConfidence) ||
                     isEnabled(
@@ -288,6 +321,31 @@ class ActivitySensorManager :
             } catch (e: Exception) {
                 Timber.e(e, "Unable to register for sleep updates")
             }
+        }
+    }
+
+    private fun removeDisabledSleepUpdates(context: Context) {
+        if (HealthSensorReleasePolicy.sleepSensorsEnabled) return
+        // Match only an existing Sleep subscription; never create one or affect activity updates.
+        val intent = Intent(context, ActivitySensorManager::class.java).apply { action = ACTION_SLEEP_ACTIVITY }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            SLEEP_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_MUTABLE,
+        ) ?: return
+        try {
+            ActivityRecognition.getClient(context).removeSleepSegmentUpdates(pendingIntent)
+                .addOnSuccessListener {
+                    pendingIntent.cancel()
+                    sleepRegistration = false
+                }
+                .addOnFailureListener {
+                    // Keep the token so a later sensor update can retry removal without requesting permissions.
+                    Timber.e(it, "Unable to remove disabled sleep updates")
+                }
+        } catch (e: SecurityException) {
+            Timber.e(e, "Unable to remove disabled sleep updates")
         }
     }
 

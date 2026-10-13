@@ -21,6 +21,7 @@ import io.homeassistant.companion.android.di.qualifiers.LocationTrackingSupport
 import io.homeassistant.companion.android.frontend.navigation.FrontendRoute
 import io.homeassistant.companion.android.onboarding.OnboardingRoute
 import io.homeassistant.companion.android.onboarding.WearOnboardingRoute
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
@@ -48,7 +49,7 @@ internal sealed interface LaunchUiState {
     data object NetworkUnavailable : LaunchUiState
 
     /**
-     * Wear OS onboarding was requested but is not supported in the minimal flavor.
+     * Wear OS onboarding was requested but is not supported by this release or flavor.
      */
     data object WearUnsupported : LaunchUiState
 }
@@ -162,7 +163,7 @@ internal class LaunchViewModel @VisibleForTesting constructor(
     }
 
     private fun navigateToWearOnboarding(wearName: String, urlToOnboard: String? = null) {
-        if (!hasLocationTrackingSupport) {
+        if (!PhoneIntegrationReleasePolicy.wearSetupEnabled || !hasLocationTrackingSupport) {
             // Wear OS requires Google Play Services for communication, which is only available in full flavor
             _uiState.value = LaunchUiState.WearUnsupported
             return

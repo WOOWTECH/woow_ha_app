@@ -22,6 +22,7 @@ import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.settings.wear.SettingsWearViewModel.Companion.CAPABILITY_WEAR_APP
 import io.homeassistant.companion.android.settings.wear.views.SettingsWearMainView
 import io.homeassistant.companion.android.settings.wear.views.SettingsWearOnboardingView
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import io.homeassistant.companion.android.util.compose.HomeAssistantAppTheme
 import io.homeassistant.companion.android.util.enableEdgeToEdgeCompat
 import kotlinx.coroutines.CancellationException
@@ -41,6 +42,11 @@ class SettingsWearActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!PhoneIntegrationReleasePolicy.wearSetupEnabled) {
+            Toast.makeText(this, commonR.string.phone_integration_unavailable, Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
 
         enableEdgeToEdgeCompat()
 
@@ -109,6 +115,7 @@ class SettingsWearActivity :
      * Updates UI when capabilities change (install/uninstall wear app).
      */
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
+        if (!PhoneIntegrationReleasePolicy.wearSetupEnabled) return
         settingsWearViewModel.updateWearNodesWithApp(capabilityInfo.nodes)
         lifecycleScope.launch {
             // Because we have an updated list of devices with/without our app, we need to also update
@@ -167,7 +174,7 @@ class SettingsWearActivity :
 
     private fun getAuthIntentUrl(): String? {
         return intent.data?.let {
-            if (it.scheme == "homeassistant" && it.host == "wear-phone-signin") {
+            if (it.scheme == "woowtech" && it.host == "wear-phone-signin") {
                 // Return empty string if phone sign in was used to open this, indicating no instance selected
                 it.getQueryParameter("url") ?: ""
             } else {

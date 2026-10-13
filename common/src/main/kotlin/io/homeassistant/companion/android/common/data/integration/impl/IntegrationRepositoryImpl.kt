@@ -79,8 +79,9 @@ class IntegrationRepositoryImpl @AssistedInject constructor(
 ) : IntegrationRepository {
 
     companion object {
-        private const val APP_ID = "io.homeassistant.companion.android"
-        private const val APP_NAME = "Home Assistant"
+        // Product registration identity shared by phone, Wear and Automotive, not the Kotlin namespace.
+        private const val APP_ID = "com.woowtech.aiot"
+        private const val APP_NAME = "woowtech aiot"
         private const val OS_NAME = "Android"
 
         // Note: _not_ server-specific

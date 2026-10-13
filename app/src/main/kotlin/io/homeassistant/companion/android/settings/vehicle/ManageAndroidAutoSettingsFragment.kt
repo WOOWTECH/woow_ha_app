@@ -13,7 +13,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.util.isAutomotive
 import io.homeassistant.companion.android.settings.addHelpMenuProvider
+import io.homeassistant.companion.android.settings.sensor.dismissUnavailableSensor
 import io.homeassistant.companion.android.settings.vehicle.views.AndroidAutoFavoritesSettings
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import io.homeassistant.companion.android.util.compose.HomeAssistantAppTheme
 
 @AndroidEntryPoint
@@ -23,6 +25,7 @@ class ManageAndroidAutoSettingsFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        if (!PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled) return View(requireContext())
         return ComposeView(requireContext()).apply {
             setContent {
                 HomeAssistantAppTheme {
@@ -37,6 +40,10 @@ class ManageAndroidAutoSettingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (!PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled) {
+            dismissUnavailableSensor()
+            return
+        }
         addHelpMenuProvider("https://aiot.woowtech.io/docs/android-auto")
     }
 

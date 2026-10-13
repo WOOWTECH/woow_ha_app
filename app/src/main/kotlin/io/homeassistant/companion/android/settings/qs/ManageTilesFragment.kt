@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import com.mikepenz.iconics.typeface.IIcon
 import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.settings.addHelpMenuProvider
 import io.homeassistant.companion.android.settings.qs.views.ManageTilesView
 import io.homeassistant.companion.android.util.compose.HomeAssistantAppTheme
@@ -52,7 +53,7 @@ class ManageTilesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://aiot.woowtech.io/docs/integrations/android-quick-settings")
+        addHelpMenuProvider("${AppSupportLinks.SHORTCUTS}#android-quick-settings")
     }
 
     override fun onResume() {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Environment
 import android.os.StatFs
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import java.io.File
 import kotlin.math.roundToInt
 import timber.log.Timber
@@ -59,7 +60,7 @@ class StorageSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#storage-sensor"
+        return "${AppSupportLinks.SENSORS}#storage-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_storage

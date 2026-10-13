@@ -50,7 +50,7 @@ object LogOnlyFailFastHandler : FailFastHandler {
                 appendLine(
                     """
             The error has been ignored to avoid a crash, but it should be handled.
-            Please create a bug report at https://github.com/home-assistant/android/issues/new.
+            Please contact support at ${AppSupportLinks.SUPPORT}.
                     """.trimIndent(),
                 )
                 appendLine()

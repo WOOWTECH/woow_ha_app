@@ -20,9 +20,9 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Newspaper
+import androidx.compose.material.icons.outlined.SupportAgent
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -36,14 +36,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import io.homeassistant.companion.android.R
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.compose.composable.HAAccentButton
 import io.homeassistant.companion.android.common.compose.composable.HABanner
@@ -56,6 +54,7 @@ import io.homeassistant.companion.android.common.compose.theme.HATextStyle
 import io.homeassistant.companion.android.common.compose.theme.HAThemeForPreview
 import io.homeassistant.companion.android.common.compose.theme.MaxButtonWidth
 import io.homeassistant.companion.android.common.data.connectivity.ConnectivityCheckState
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.util.compose.HAPreviews
 import kotlinx.coroutines.launch
 
@@ -64,10 +63,7 @@ private val MaxContentWidth = MaxButtonWidth
 @VisibleForTesting
 internal const val URL_INFO_TAG = "url_info"
 
-private const val URL_DOCUMENTATION = "https://aiot.woowtech.io/docs/troubleshooting/faqs/"
-private const val URL_COMMUNITY_FORUM = "https://aiot.woowtech.io/c/mobile-apps/android-companion/42"
-private const val URL_GITHUB_ISSUES = "https://github.com/home-assistant/android/issues"
-private const val URL_DISCORD = "https://discord.com/channels/330944238910963714/1284965926336335993"
+private const val URL_DOCUMENTATION = AppSupportLinks.CONNECTION
 
 @Composable
 internal fun ConnectionErrorScreen(
@@ -340,29 +336,11 @@ private fun ColumnScope.GetMoreHelp(onOpenExternalLink: suspend (Uri) -> Unit) {
             },
         )
         HAIconButton(
-            icon = Icons.Outlined.Forum,
-            contentDescription = stringResource(commonR.string.connection_error_forum_content_description),
+            icon = Icons.Outlined.SupportAgent,
+            contentDescription = stringResource(commonR.string.connection_error_support_content_description),
             onClick = {
                 coroutineScope.launch {
-                    onOpenExternalLink(URL_COMMUNITY_FORUM.toUri())
-                }
-            },
-        )
-        HAIconButton(
-            icon = ImageVector.vectorResource(R.drawable.github),
-            contentDescription = stringResource(commonR.string.connection_error_github_content_description),
-            onClick = {
-                coroutineScope.launch {
-                    onOpenExternalLink(URL_GITHUB_ISSUES.toUri())
-                }
-            },
-        )
-        HAIconButton(
-            icon = ImageVector.vectorResource(R.drawable.discord),
-            contentDescription = stringResource(commonR.string.connection_error_discord_content_description),
-            onClick = {
-                coroutineScope.launch {
-                    onOpenExternalLink(URL_DISCORD.toUri())
+                    onOpenExternalLink(AppSupportLinks.SUPPORT.toUri())
                 }
             },
         )

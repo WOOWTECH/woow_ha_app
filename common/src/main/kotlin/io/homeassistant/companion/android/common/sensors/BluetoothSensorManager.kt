@@ -15,6 +15,7 @@ import io.homeassistant.companion.android.common.bluetooth.ble.KalmanFilter
 import io.homeassistant.companion.android.common.bluetooth.ble.MonitoringManager
 import io.homeassistant.companion.android.common.bluetooth.ble.TransmitterManager
 import io.homeassistant.companion.android.common.bluetooth.ble.name
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import io.homeassistant.companion.android.database.DatabaseEntryPoint
 import io.homeassistant.companion.android.database.sensor.SensorSetting
@@ -162,7 +163,7 @@ class BluetoothSensorManager : SensorManager {
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#bluetooth-sensors"
+        return "${AppSupportLinks.SENSORS}#bluetooth-sensors"
     }
 
     override val name: Int

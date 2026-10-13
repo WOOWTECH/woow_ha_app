@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.settings.addHelpMenuProvider
 import io.homeassistant.companion.android.settings.gestures.views.GesturesScreen
 import io.homeassistant.companion.android.util.compose.HomeAssistantAppTheme
@@ -35,6 +36,6 @@ class GesturesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://aiot.woowtech.io/docs/integrations/gestures")
+        addHelpMenuProvider("${AppSupportLinks.SHORTCUTS}#gestures")
     }
 }

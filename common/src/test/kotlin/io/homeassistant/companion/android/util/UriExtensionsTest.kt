@@ -3,6 +3,7 @@ package io.homeassistant.companion.android.util
 import android.net.Uri
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -16,6 +17,36 @@ import org.robolectric.RobolectricTestRunner
  */
 @RunWith(RobolectricTestRunner::class)
 class UriExtensionsTest {
+
+    @Test
+    fun `Given supported NFC URLs when splitting then returns the decoded identifier`() {
+        assertEquals("new tag", UrlUtil.splitNfcTagId(Uri.parse("https://aiot.woowtech.io/tag/new%20tag")))
+        assertEquals("legacy", UrlUtil.splitNfcTagId(Uri.parse("https://www.home-assistant.io/tag/legacy")))
+    }
+
+    @Test
+    fun `Given an NFC identifier when building then uses the branded host and safe encoding`() {
+        assertEquals(
+            "https://aiot.woowtech.io/tag/new%20tag",
+            UrlUtil.buildNfcTagUri("new tag").toString(),
+        )
+    }
+
+    @Test
+    fun `Given hostile or malformed NFC URLs when splitting then rejects them`() {
+        listOf(
+            "http://aiot.woowtech.io/tag/id",
+            "https://aiot.woowtech.io.evil.example/tag/id",
+            "https://user@aiot.woowtech.io/tag/id",
+            "https://aiot.woowtech.io:443/tag/id",
+            "https://aiot.woowtech.io/tag/",
+            "https://aiot.woowtech.io/tag/id/extra",
+            "https://aiot.woowtech.io/other/id",
+            "https://aiot.woowtech.io/tag/id?next=https://evil.example",
+            "https://aiot.woowtech.io/tag/id#fragment",
+            "https://aiot.woowtech.io/tag/id%2Fextra",
+        ).forEach { assertNull(it, UrlUtil.splitNfcTagId(Uri.parse(it))) }
+    }
 
     @Test
     fun `hasSameOrigin returns expected value`() {

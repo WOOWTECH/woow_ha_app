@@ -109,10 +109,6 @@ open class HomeAssistantApplication :
         registerActivityLifecycleCallbacks(LifecycleHandler)
 
         ioScope.launch {
-            initCrashReporting(
-                applicationContext,
-                prefsRepository.isCrashReporting(),
-            )
             initCrashSaving(applicationContext)
             languagesManager.applyCurrentLang()
             nightModeManager.applyCurrentNightMode()

@@ -10,6 +10,7 @@ import android.hardware.SensorManager.SENSOR_DELAY_NORMAL
 import android.os.Build
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class StepsSensorManager :
+/** Product registries must explicitly supply their release policy before constructing this shared producer. */
+class StepsSensorManager(override val enabledByRelease: Boolean) :
     SensorManager,
     SensorEventListener {
     companion object {
@@ -37,20 +39,21 @@ class StepsSensorManager :
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#pedometer-sensors"
+        return "${AppSupportLinks.SENSORS}#pedometer-sensors"
     }
 
     override val name: Int
         get() = commonR.string.sensor_name_steps
 
     override suspend fun getAvailableSensors(context: Context): List<SensorManager.BasicSensor> {
-        return listOf(stepsSensor)
+        return if (enabledByRelease) listOf(stepsSensor) else emptyList()
     }
 
     private lateinit var latestContext: Context
     private lateinit var mySensorManager: android.hardware.SensorManager
 
     override fun requiredPermissions(context: Context, sensorId: String): Array<String> {
+        if (!enabledByRelease) return emptyArray()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             arrayOf(Manifest.permission.ACTIVITY_RECOGNITION)
         } else {
@@ -59,11 +62,13 @@ class StepsSensorManager :
     }
 
     override fun hasSensor(context: Context): Boolean {
+        if (!enabledByRelease) return false
         val packageManager: PackageManager = context.packageManager
         return packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_COUNTER)
     }
 
     override suspend fun requestSensorUpdate(context: Context) {
+        if (!enabledByRelease) return
         latestContext = context
         updateStepsSensor()
     }
@@ -101,6 +106,7 @@ class StepsSensorManager :
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        if (!enabledByRelease) return
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
             ioScope.launch {
                 onSensorUpdated(

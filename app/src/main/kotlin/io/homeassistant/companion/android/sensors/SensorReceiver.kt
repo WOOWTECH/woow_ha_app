@@ -18,6 +18,7 @@ import io.homeassistant.companion.android.common.sensors.BatterySensorManager
 import io.homeassistant.companion.android.common.sensors.BluetoothSensorManager
 import io.homeassistant.companion.android.common.sensors.DNDSensorManager
 import io.homeassistant.companion.android.common.sensors.DisplaySensorManager
+import io.homeassistant.companion.android.common.sensors.HealthSensorReleasePolicy
 import io.homeassistant.companion.android.common.sensors.KeyguardSensorManager
 import io.homeassistant.companion.android.common.sensors.LastRebootSensorManager
 import io.homeassistant.companion.android.common.sensors.LastUpdateManager
@@ -37,6 +38,7 @@ import io.homeassistant.companion.android.common.sensors.StorageSensorManager
 import io.homeassistant.companion.android.common.sensors.TimeZoneManager
 import io.homeassistant.companion.android.common.sensors.TrafficStatsManager
 import io.homeassistant.companion.android.settings.SettingsActivity
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 
 @AndroidEntryPoint
 class SensorReceiver : SensorReceiverBase() {
@@ -48,21 +50,21 @@ class SensorReceiver : SensorReceiverBase() {
         get() = MANAGERS
 
     companion object {
-        val MANAGERS = listOf(
-            ActivitySensorManager(),
-            AndroidAutoSensorManager(),
+        val MANAGERS = listOfNotNull(
+            if (PhoneIntegrationReleasePolicy.fitnessSensorsEnabled) ActivitySensorManager() else null,
+            if (PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled) AndroidAutoSensorManager() else null,
             AndroidOsSensorManager(),
             AppSensorManager(),
             AudioSensorManager(),
             BatterySensorManager(),
             BluetoothSensorManager(),
-            CarSensorManager(),
+            if (PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled) CarSensorManager() else null,
             DisplaySensorManager(),
             DNDSensorManager(),
             DynamicColorSensorManager(),
             DevicePolicyManager(),
             GeocodeSensorManager(),
-            HealthConnectSensorManager(),
+            if (HealthSensorReleasePolicy.healthConnectEnabled) HealthConnectSensorManager() else null,
             KeyguardSensorManager(),
             LastAppSensorManager(),
             LastRebootSensorManager(),
@@ -79,7 +81,11 @@ class SensorReceiver : SensorReceiverBase() {
             PressureSensorManager(),
             ProximitySensorManager(),
             QuestSensorManager(),
-            StepsSensorManager(),
+            if (PhoneIntegrationReleasePolicy.fitnessSensorsEnabled) {
+                StepsSensorManager(enabledByRelease = PhoneIntegrationReleasePolicy.fitnessSensorsEnabled)
+            } else {
+                null
+            },
             StorageSensorManager(),
             TimeZoneManager(),
             TrafficStatsManager(),

@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import io.homeassistant.companion.android.common.util.isAutomotive
 
@@ -22,7 +23,7 @@ class DNDSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#do-not-disturb-sensor"
+        return "${AppSupportLinks.SENSORS}#do-not-disturb-sensor"
     }
 
     override val name: Int

@@ -79,7 +79,7 @@ class ButtonWidgetConfigureActivity : BaseWidgetConfigureActivity<ButtonWidgetEn
         )
 
         AlertDialog.Builder(context)
-            .setTitle("Field")
+            .setTitle(commonR.string.add_action_data_field)
             .setView(fieldKeyInput)
             .setNegativeButton(android.R.string.cancel) { _, _ -> }
             .setPositiveButton(android.R.string.ok) { _, _ ->

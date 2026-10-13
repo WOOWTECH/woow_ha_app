@@ -26,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.nfc.NfcSetupActivity
 import io.homeassistant.companion.android.nfc.NfcViewModel
 import io.homeassistant.companion.android.util.safeBottomWindowInsets
@@ -95,7 +96,7 @@ fun LoadNfcView(viewModel: NfcViewModel, startDestination: String, pressedUpAtRo
                             val intent =
                                 Intent(
                                     Intent.ACTION_VIEW,
-                                    "https://aiot.woowtech.io/docs/integrations/universal-links".toUri(),
+                                    "${AppSupportLinks.NFC}#universal-links".toUri(),
                                 )
                             context.startActivity(intent)
                         },
