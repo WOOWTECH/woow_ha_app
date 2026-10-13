@@ -341,7 +341,7 @@
     <string name="interval_in_view">In view</string>
     <string name="improv_device_authorization_required">The device requires authorization, please press its authorization button or consult the device\'s manual for how to proceed.</string>
     <string name="improv_device_authorized">Setting up Wi-Fi</string>
-    <string name="improv_device_connecting">Connecting...</string>
+    <string name="improv_device_connecting">Connecting…</string>
     <string name="improv_device_provisioned">Wi-Fi connected successfully</string>
     <string name="improv_device_provisioning">Connecting to Wi-Fi</string>
     <string name="improv_error_invalid_rpc_packet">Invalid RPC Packet</string>
@@ -1183,7 +1183,7 @@
     <string name="assist_connnect">Assist couldn\'t reach woowtech aiot, check your connection</string>
     <string name="assist_change_pipeline">Change assistant</string>
     <string name="assist_enter_text">Enter text</string>
-    <string name="assist_enter_a_request">Ask me anything...</string>
+    <string name="assist_enter_a_request">Ask me anything…</string>
     <string name="assist_error">Oops, an error has occurred</string>
     <string name="assist_how_can_i_assist">How can I assist?</string>
     <string name="assist_last_used_pipeline">Last used assistant</string>

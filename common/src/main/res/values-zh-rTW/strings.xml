@@ -764,7 +764,7 @@
     <string name="server_select">選擇伺服器</string>
     <string name="server_delete">刪除伺服器</string>
     <string name="server_delete_confirm">確定要刪除伺服器？</string>
-    <string name="server_delete_working">正在刪除伺服器...</string>
+    <string name="server_delete_working">正在刪除伺服器…</string>
     <string name="server_name">伺服器名稱</string>
     <string name="action_failure">無法傳送動作</string>
     <string name="session_timeout_title">工作階段逾時（秒）</string>
@@ -1177,7 +1177,7 @@
     <string name="assist_connnect">助理無法連線至 woowtech aiot，請檢查您的連線</string>
     <string name="assist_change_pipeline">變更助理</string>
     <string name="assist_enter_text">輸入文字</string>
-    <string name="assist_enter_a_request">詢問任何問題...</string>
+    <string name="assist_enter_a_request">詢問任何問題…</string>
     <string name="assist_error">糟糕，發生了錯誤</string>
     <string name="assist_how_can_i_assist">我可以怎麼幫助您？</string>
     <string name="assist_last_used_pipeline">上次使用的助理</string>
