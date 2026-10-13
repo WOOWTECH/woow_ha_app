@@ -2,6 +2,7 @@ package io.homeassistant.companion.android.sensors
 
 import android.content.Context
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.mockk.Called
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
