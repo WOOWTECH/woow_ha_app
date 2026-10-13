@@ -277,6 +277,9 @@ class ActivitySensorManager :
         requestSleepUpdates(context)
     }
 
+    // Retained for a future reviewed release. The policy disables Sleep in every current flavor;
+    // re-enabling it requires manifest permissions and grant validation (see HealthSensorReleasePolicy).
+    @SuppressLint("MissingPermission")
     private suspend fun requestSleepUpdates(context: Context) {
         if (!HealthSensorReleasePolicy.sleepSensorsEnabled) return
         if ((

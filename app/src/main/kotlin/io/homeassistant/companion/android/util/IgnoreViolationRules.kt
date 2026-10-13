@@ -395,6 +395,8 @@ private data object IgnoreChromiumKeyStoreDiskWrite : IgnoreViolationRule {
  * beyond application control.
  */
 private data object IgnoreMediatekFrameworkDiskAccess : IgnoreViolationRule {
+    // Shared with the phone app (minSdk 23); Automotive alone has minSdk 28.
+    @SuppressLint("ObsoleteSdkInt")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun shouldIgnore(violation: Violation): Boolean {
         if (violation !is DiskReadViolation && violation !is DiskWriteViolation) return false
