@@ -252,15 +252,16 @@ class ActivitySensorManager :
         if (isEnabled(context, activity)) {
             val actReg = ActivityRecognition.getClient(context)
             val pendingIntent = getActivityPendingIntent(context)
-            Timber.d("Unregistering for activity updates.")
-            actReg.removeActivityUpdates(pendingIntent)
-
-            Timber.d("Registering for activity updates.")
             val fastUpdate = SensorReceiverBase.shouldDoFastUpdates(context)
             try {
+                // isEnabled checks permissions, but they can be revoked before either SDK call.
+                Timber.d("Unregistering for activity updates.")
+                actReg.removeActivityUpdates(pendingIntent)
+
+                Timber.d("Registering for activity updates.")
                 actReg.requestActivityUpdates(TimeUnit.MINUTES.toMillis(if (fastUpdate) 1 else 2), pendingIntent)
             } catch (e: Exception) {
-                Timber.e(e, "Unable to register for activity updates")
+                Timber.e(e, "Unable to update activity registration")
             }
         }
         if (!HealthSensorReleasePolicy.sleepSensorsEnabled) {

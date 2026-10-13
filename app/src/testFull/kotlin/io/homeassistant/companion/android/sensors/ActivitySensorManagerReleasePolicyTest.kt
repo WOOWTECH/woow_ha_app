@@ -128,6 +128,28 @@ class ActivitySensorManagerReleasePolicyTest {
     }
 
     @Test
+    fun `Given permission revoked during activity removal then no new subscription is requested`() = runTest {
+        mockkObject(PhoneIntegrationReleasePolicy)
+        every { PhoneIntegrationReleasePolicy.fitnessSensorsEnabled } returns true
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val manager = spyk(ActivitySensorManager())
+        val client = mockk<ActivityRecognitionClient>(relaxed = true)
+        mockkStatic(ActivityRecognition::class)
+        every { ActivityRecognition.getClient(context) } returns client
+        every { client.removeActivityUpdates(any()) } throws SecurityException("Permission revoked")
+        mockkObject(SensorReceiverBase.Companion)
+        coEvery { SensorReceiverBase.shouldDoFastUpdates(context) } returns false
+        coEvery { manager.isEnabled(context, any()) } answers {
+            secondArg<SensorManager.BasicSensor>().id == "detected_activity"
+        }
+
+        manager.requestSensorUpdate(context)
+
+        verify(exactly = 1) { client.removeActivityUpdates(any()) }
+        verify(exactly = 0) { client.requestActivityUpdates(any(), any()) }
+    }
+
+    @Test
     fun `Given Automotive sleep unsubscribe fails when updating then retain token without subscribing`() = runTest {
         mockkObject(PhoneIntegrationReleasePolicy)
         every { PhoneIntegrationReleasePolicy.fitnessSensorsEnabled } returns true

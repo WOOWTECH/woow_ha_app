@@ -478,15 +478,11 @@
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                    android:host="aiot.woowtech.io"
-                    android:pathPrefix="/tag/" />
+                <data android:scheme="https" />
+                <data android:host="aiot.woowtech.io" />
                 <!-- Read compatibility for tags written by the upstream Home Assistant app. -->
-                <data
-                    android:scheme="https"
-                    android:host="www.home-assistant.io"
-                    android:pathPrefix="/tag/" />
+                <data android:host="www.home-assistant.io" />
+                <data android:pathPrefix="/tag/" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
