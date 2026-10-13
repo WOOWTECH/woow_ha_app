@@ -1,6 +1,7 @@
 package io.homeassistant.companion.android.sensors
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -247,6 +248,9 @@ class ActivitySensorManager :
         return enabledByRelease && !context.isAutomotive()
     }
 
+    // Phone releases remove these permissions and return at enabledByRelease. Automotive retains them;
+    // isEnabled checks grants, and SecurityException handles revocation between the check and SDK calls.
+    @SuppressLint("MissingPermission")
     override suspend fun requestSensorUpdate(context: Context) {
         if (!enabledByRelease) return
         if (isEnabled(context, activity)) {
