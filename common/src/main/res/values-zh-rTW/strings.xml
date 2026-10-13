@@ -336,7 +336,7 @@
     <string name="interval_in_view">在檢視中</string>
     <string name="improv_device_authorization_required">該裝置需要授權，請按下其授權按鈕或參閱裝置的使用手冊以了解如何進行。</string>
     <string name="improv_device_authorized">設定 Wi-Fi</string>
-    <string name="improv_device_connecting">連線中...</string>
+    <string name="improv_device_connecting">連線中…</string>
     <string name="improv_device_provisioned">Wi-Fi 連線成功</string>
     <string name="improv_device_provisioning">連線至 Wi-Fi</string>
     <string name="improv_error_invalid_rpc_packet">RPC 封包無效</string>

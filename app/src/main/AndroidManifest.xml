@@ -385,10 +385,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:scheme="https"
-                    android:host="aiot.woowtech.io"
-                    android:pathPrefix="/invite/"/>
+                <data android:scheme="https" />
+                <data android:host="aiot.woowtech.io" />
+                <data android:path="/invite" />
+                <data android:pathPrefix="/invite/" />
             </intent-filter>
 
             <intent-filter>
