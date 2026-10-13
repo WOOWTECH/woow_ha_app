@@ -113,14 +113,13 @@ class NotificationActionReceiverTest {
         action = action,
     )
 
-    private fun action(data: Map<String, String> = mapOf(NotificationData.WEBHOOK_ID to FIXTURE_WEBHOOK_ID)) =
-        NotificationAction(
-            key = "FIXTURE_OPEN",
-            title = "Fixture action",
-            uri = null,
-            behavior = null,
-            data = data,
-        )
+    private fun action(data: Map<String, String> = mapOf(NotificationData.WEBHOOK_ID to FIXTURE_WEBHOOK_ID)) = NotificationAction(
+        key = "FIXTURE_OPEN",
+        title = "Fixture action",
+        uri = null,
+        behavior = null,
+        data = data,
+    )
 
     private fun notification(serverId: Int?) = NotificationItem(
         id = FIXTURE_DATABASE_ID.toInt(),

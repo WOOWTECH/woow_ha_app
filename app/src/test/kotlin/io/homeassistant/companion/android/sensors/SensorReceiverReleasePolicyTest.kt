@@ -80,7 +80,11 @@ class SensorReceiverReleasePolicyTest {
             ),
         )
         val staleRows = listOf(
-            "health_connect_steps", "sleep_confidence", "android_auto", "steps_sensor", "detected_activity",
+            "health_connect_steps",
+            "sleep_confidence",
+            "android_auto",
+            "steps_sensor",
+            "detected_activity",
         ).map {
             Sensor(it, serverId = 1, enabled = true, registered = true, state = "stale")
         }

@@ -99,7 +99,8 @@ class EntityAddToHandler @Inject constructor(
                     }
 
                     if (PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled &&
-                        isVehicleDomain(entity) && (isFullFlavor || isAutomotive)
+                        isVehicleDomain(entity) &&
+                        (isFullFlavor || isAutomotive)
                     ) {
                         // We could check if it already exist but the action won't do anything so we can keep it
                         actions.add(EntityAddToAction.AndroidAutoFavorite)

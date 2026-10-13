@@ -77,8 +77,7 @@ private class ReleasePolicyTestSensorManager(managerAllowed: Boolean, private va
     override val enabledByRelease: Boolean = managerAllowed
     override val name: Int = -1
 
-    override fun isSensorEnabledByRelease(sensorId: String): Boolean =
-        super.isSensorEnabledByRelease(sensorId) && sensorAllowed
+    override fun isSensorEnabledByRelease(sensorId: String): Boolean = super.isSensorEnabledByRelease(sensorId) && sensorAllowed
 
     override fun requiredPermissions(context: Context, sensorId: String): Array<String> = emptyArray()
 

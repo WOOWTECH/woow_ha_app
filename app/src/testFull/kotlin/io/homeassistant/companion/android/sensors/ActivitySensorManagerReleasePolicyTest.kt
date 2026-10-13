@@ -46,16 +46,17 @@ class ActivitySensorManagerReleasePolicyTest {
     }
 
     @Test
-    fun `Given phone release when discovering activity sensors then none are available without permission access`() = runTest {
-        val context = mockk<Context>()
-        val manager = ActivitySensorManager()
-        assertFalse(manager.enabledByRelease)
-        assertFalse(manager.hasSensor(context))
-        assertTrue(manager.getAvailableSensors(context).isEmpty())
-        assertFalse(manager.isSensorEnabledByRelease("detected_activity"))
-        assertTrue(manager.requiredPermissions(context, "detected_activity").isEmpty())
-        verify { context wasNot Called }
-    }
+    fun `Given phone release when discovering activity sensors then none are available without permission access`() =
+        runTest {
+            val context = mockk<Context>()
+            val manager = ActivitySensorManager()
+            assertFalse(manager.enabledByRelease)
+            assertFalse(manager.hasSensor(context))
+            assertTrue(manager.getAvailableSensors(context).isEmpty())
+            assertFalse(manager.isSensorEnabledByRelease("detected_activity"))
+            assertTrue(manager.requiredPermissions(context, "detected_activity").isEmpty())
+            verify { context wasNot Called }
+        }
 
     @Test
     fun `Given stale activity opt in when checked or updated then no storage or permission access occurs`() {
@@ -100,7 +101,7 @@ class ActivitySensorManagerReleasePolicyTest {
     }
 
     @Test
-    fun `Given Automotive policy and prior sleep subscription when updating then remove only sleep and retain activity`() = runTest {
+    fun `Given Automotive with sleep subscription when updating then retain only activity`() = runTest {
         mockkObject(PhoneIntegrationReleasePolicy)
         every { PhoneIntegrationReleasePolicy.fitnessSensorsEnabled } returns true
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -127,7 +128,7 @@ class ActivitySensorManagerReleasePolicyTest {
     }
 
     @Test
-    fun `Given Automotive policy and failed sleep unsubscribe when updating then preserve token for retry and never subscribe`() = runTest {
+    fun `Given Automotive sleep unsubscribe fails when updating then retain token without subscribing`() = runTest {
         mockkObject(PhoneIntegrationReleasePolicy)
         every { PhoneIntegrationReleasePolicy.fitnessSensorsEnabled } returns true
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -167,33 +168,34 @@ class ActivitySensorManagerReleasePolicyTest {
     }
 
     @Test
-    fun `Given phone with stale subscriptions and opt ins when updating then no SDK or stored settings are accessed`() = runTest {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        val sleepIntent = sleepPendingIntent(context, create = true)
-        val activityIntent = PendingIntent.getBroadcast(
-            context,
-            0,
-            Intent(context, ActivitySensorManager::class.java).apply {
-                action = ActivitySensorManager.ACTION_UPDATE_ACTIVITY
-            },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
-        )
-        val manager = spyk(ActivitySensorManager())
-        coEvery { manager.isEnabled(context, any()) } returns true
-        mockkStatic(ActivityRecognition::class)
-        try {
-            manager.requestSensorUpdate(context)
+    fun `Given phone with stale subscriptions and opt ins when updating then no SDK or stored settings are accessed`() =
+        runTest {
+            val context = ApplicationProvider.getApplicationContext<Context>()
+            val sleepIntent = sleepPendingIntent(context, create = true)
+            val activityIntent = PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(context, ActivitySensorManager::class.java).apply {
+                    action = ActivitySensorManager.ACTION_UPDATE_ACTIVITY
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+            )
+            val manager = spyk(ActivitySensorManager())
+            coEvery { manager.isEnabled(context, any()) } returns true
+            mockkStatic(ActivityRecognition::class)
+            try {
+                manager.requestSensorUpdate(context)
 
-            verify(exactly = 0) { ActivityRecognition.getClient(any<Context>()) }
-            coVerify(exactly = 0) { manager.isEnabled(any(), any()) }
-            coVerify(exactly = 0) { manager.onSensorUpdated(any(), any(), any(), any(), any(), any()) }
-            // Ignoring legacy tokens is not proof of historical GMS subscription removal.
-            assertNotNull(sleepPendingIntent(context, create = false))
-        } finally {
-            sleepIntent?.cancel()
-            activityIntent.cancel()
+                verify(exactly = 0) { ActivityRecognition.getClient(any<Context>()) }
+                coVerify(exactly = 0) { manager.isEnabled(any(), any()) }
+                coVerify(exactly = 0) { manager.onSensorUpdated(any(), any(), any(), any(), any(), any()) }
+                // Ignoring legacy tokens is not proof of historical GMS subscription removal.
+                assertNotNull(sleepPendingIntent(context, create = false))
+            } finally {
+                sleepIntent?.cancel()
+                activityIntent.cancel()
+            }
         }
-    }
 
     @Test
     fun `Given stale phone activity callback when received then no extraction client or sensor write occurs`() {

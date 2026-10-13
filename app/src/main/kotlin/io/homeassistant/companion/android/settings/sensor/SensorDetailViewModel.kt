@@ -97,7 +97,8 @@ class SensorDetailViewModel @Inject constructor(
     val sensorManager: SensorManager? = runBlocking {
         SensorReceiver.MANAGERS
             .find {
-                it.isSensorEnabledByRelease(sensorId) && it.hasSensor(getApplication()) &&
+                it.isSensorEnabledByRelease(sensorId) &&
+                    it.hasSensor(getApplication()) &&
                     it.getAvailableSensors(getApplication()).any { sensor -> sensor.id == sensorId }
             }
     }
