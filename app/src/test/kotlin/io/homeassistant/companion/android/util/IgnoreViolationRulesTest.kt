@@ -71,17 +71,27 @@ class IgnoreViolationRulesTest {
     }
 
     @Test
-    fun `Given a MIUI class outside the font package when checking thread rules then violation is not ignored`() {
-        // The miui.util.font. prefix requires the trailing package dot so it does not swallow
+    fun `Given a MIUI class outside the util package when checking thread rules then violation is not ignored`() {
+        // The miui.util. prefix requires the trailing package dot so it does not swallow
         // unrelated MIUI disk reads from a differently named sibling package.
         val nearMiss = arrayOf(
             StackTraceElement("android.os.StrictMode\$AndroidBlockGuardPolicy", "onReadFromDisk", "StrictMode.java", 1666),
             StackTraceElement("libcore.io.BlockGuardOs", "access", "BlockGuardOs.java", 74),
             StackTraceElement("java.io.File", "exists", "File.java", 829),
-            StackTraceElement("miui.util.fontmanager.FontManager", "load", "FontManager.java", 42),
+            StackTraceElement("miui.utilities.FontManager", "load", "FontManager.java", 42),
         )
 
         assertFalse(isIgnoredByThreadPolicy(diskReadViolation(nearMiss)))
+    }
+
+    @Test
+    fun `Given MIUI sibling typeface utilities when checking thread rules then only disk reads are ignored`() {
+        // Mi 11 Ultra resolves fonts through these siblings outside miui.util.font.
+        for (className in listOf("miui.util.TypefaceHelper", "miui.util.TypefaceUtils")) {
+            val trace = arrayOf(StackTraceElement(className, "create", "TypefaceUtils.java", 42))
+            assertTrue(isIgnoredByThreadPolicy(diskReadViolation(trace)))
+            assertFalse(isIgnoredByThreadPolicy(diskWriteViolation(trace)))
+        }
     }
 
     private fun isIgnoredByThreadPolicy(violation: Violation): Boolean {

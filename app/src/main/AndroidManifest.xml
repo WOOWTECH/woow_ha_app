@@ -26,11 +26,10 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
-    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <!-- Phone release policy also suppresses declarations from lower-priority library manifests. -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" tools:node="remove" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" tools:node="remove" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
@@ -46,32 +45,33 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions"/>
-    <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND" />
-    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
-    <!--    <uses-permission android:name="android.permission.health.READ_BASAL_BODY_TEMPERATURE" />-->
-    <!--    <uses-permission android:name="android.permission.health.READ_BASAL_METABOLIC_RATE" />-->
-    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />
-    <uses-permission android:name="android.permission.health.READ_BLOOD_PRESSURE" />
-    <uses-permission android:name="android.permission.health.READ_BODY_FAT" />
-    <!--    <uses-permission android:name="android.permission.health.READ_BODY_WATER_MASS" />-->
-    <!--    <uses-permission android:name="android.permission.health.READ_BODY_TEMPERATURE" />-->
-    <!--    <uses-permission android:name="android.permission.health.READ_BONE_MASS" />-->
-    <uses-permission android:name="android.permission.health.READ_DISTANCE" />
-    <uses-permission android:name="android.permission.health.READ_ELEVATION_GAINED" />
-    <uses-permission android:name="android.permission.health.READ_FLOORS_CLIMBED" />
-    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
-    <uses-permission android:name="android.permission.health.READ_HEART_RATE_VARIABILITY" />
-    <!--    <uses-permission android:name="android.permission.health.READ_HEIGHT" />-->
-    <!--    <uses-permission android:name="android.permission.health.READ_HYDRATION" />-->
-    <!--    <uses-permission android:name="android.permission.health.READ_LEAN_BODY_MASS" />-->
-    <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" />
-    <uses-permission android:name="android.permission.health.READ_RESPIRATORY_RATE" />
-    <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" />
-    <uses-permission android:name="android.permission.health.READ_SLEEP" />
-    <uses-permission android:name="android.permission.health.READ_STEPS" />
-    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" />
-    <uses-permission android:name="android.permission.health.READ_VO2_MAX" />
-    <uses-permission android:name="android.permission.health.READ_WEIGHT" />
+    <!-- First release: suppress Health Connect permissions, including lower-priority manifests. -->
+    <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BASAL_BODY_TEMPERATURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BASAL_METABOLIC_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BLOOD_PRESSURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BODY_FAT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BODY_WATER_MASS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BODY_TEMPERATURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BONE_MASS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_DISTANCE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_ELEVATION_GAINED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_FLOORS_CLIMBED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE_VARIABILITY" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEIGHT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HYDRATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_LEAN_BODY_MASS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_RESPIRATORY_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_STEPS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_VO2_MAX" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_WEIGHT" tools:node="remove" />
 
 
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
@@ -83,6 +83,22 @@
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+
+    <!-- The retained SDK must not add Health Connect package visibility in this release. -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" tools:node="remove" />
+        <!--
+          Replaces QUERY_ALL_PACKAGES. Everything this app does with other packages is
+          about apps a user can actually launch: the LIST_APPS sensor-setting picker
+          (notification + next-alarm allow lists) and launching a package by name from
+          an app://, intent:// link or a command_launch_app notification. Launcher
+          visibility covers all of those without broad metadata access.
+        -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
 
     <application
         android:name="io.homeassistant.companion.android.HomeAssistantApplication"
@@ -324,7 +340,7 @@
             android:permission="android.permission.BIND_CONTROLS"
             android:exported="true"
             android:resizeableActivity="true"
-            android:taskAffinity="io.homeassistant.companion.android.controls"
+            android:taskAffinity="${applicationId}.controls"
             android:enabled="false" />
 
         <receiver
@@ -369,10 +385,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:scheme="https"
-                    android:host="aiot.woowtech.io"
-                    android:pathPrefix="/invite/"/>
+                <data android:scheme="https" />
+                <data android:host="aiot.woowtech.io" />
+                <data android:path="/invite" />
+                <data android:pathPrefix="/invite/" />
             </intent-filter>
 
             <intent-filter>
@@ -381,7 +397,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="homeassistant"
+                    android:scheme="woowtech"
                     android:host="invite" />
             </intent-filter>
 
@@ -393,7 +409,7 @@
 
                 <data
                     android:host="navigate"
-                    android:scheme="homeassistant" />
+                    android:scheme="woowtech" />
             </intent-filter>
         </activity>
 
@@ -409,7 +425,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="homeassistant"
+                    android:scheme="woowtech"
                     android:host="wear-phone-signin" />
             </intent-filter>
         </activity>
@@ -430,24 +446,13 @@
             </intent-filter>
         </service>
 
+        <!-- Implementations are retained, but no Health Connect permission entry is exported. -->
         <activity
             android:name=".settings.sensor.HealthConnectPermissionActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
-            </intent-filter>
-        </activity>
-
+            tools:node="remove" />
         <activity-alias
             android:name="ViewHealthConnectPermissionUsageActivity"
-            android:exported="true"
-            android:targetActivity=".settings.sensor.HealthConnectPermissionActivity"
-            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
-                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
-            </intent-filter>
-        </activity-alias>
+            tools:node="remove" />
 
         <activity
             android:name=".webview.WebViewActivity"
@@ -473,10 +478,11 @@
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                    android:host="aiot.woowtech.io"
-                    android:pathPrefix="/tag/" />
+                <data android:scheme="https" />
+                <data android:host="aiot.woowtech.io" />
+                <!-- Read compatibility for tags written by the upstream Home Assistant app. -->
+                <data android:host="www.home-assistant.io" />
+                <data android:pathPrefix="/tag/" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -513,7 +519,7 @@
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTask"
-            android:taskAffinity="io.homeassistant.companion.android.assist"
+            android:taskAffinity="${applicationId}.assist"
             android:autoRemoveFromRecents="true"
             android:showWhenLocked="true"
             android:theme="@style/Theme.HomeAssistant.Assist">

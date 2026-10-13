@@ -92,6 +92,11 @@ class SensorDetailFragment : Fragment() {
 
     @SuppressLint("InlinedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // Old notifications or restored navigation can refer to a release-disabled sensor.
+        if (viewModel.sensorManager == null) {
+            dismissUnavailableSensor()
+            return
+        }
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(
             object : MenuProvider {
@@ -184,5 +189,14 @@ class SensorDetailFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         activity?.title = null
+    }
+}
+
+/** Returns to retained navigation, or closes a root sensor deep link with no previous fragment. */
+internal fun Fragment.dismissUnavailableSensor() {
+    if (parentFragmentManager.backStackEntryCount > 0) {
+        parentFragmentManager.popBackStack()
+    } else {
+        requireActivity().finish()
     }
 }

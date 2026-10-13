@@ -2,6 +2,7 @@ package io.homeassistant.companion.android.common.sensors
 
 import android.content.Context
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -19,7 +20,7 @@ class TimeZoneManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#current-time-zone-sensor"
+        return "${AppSupportLinks.SENSORS}#current-time-zone-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_time_zone

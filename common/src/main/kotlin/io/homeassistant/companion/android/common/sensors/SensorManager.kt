@@ -15,6 +15,7 @@ import dagger.hilt.components.SingletonComponent
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.data.servers.ServerManager
 import io.homeassistant.companion.android.common.util.AnySerializer
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.kotlinJsonMapper
 import io.homeassistant.companion.android.database.sensor.Attribute
 import io.homeassistant.companion.android.database.sensor.SensorDao
@@ -70,7 +71,7 @@ interface SensorManager {
      * URL to a documentation page that describes this sensor
      */
     fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors"
+        return AppSupportLinks.SENSORS
     }
 
     /**
@@ -78,7 +79,15 @@ interface SensorManager {
      */
     fun requiredPermissions(context: Context, sensorId: String): Array<String>
 
+    /** Release policy takes precedence over permissions and any previously stored sensor opt-in. */
+    val enabledByRelease: Boolean
+        get() = true
+
+    /** Allows a release to disable individual sensors without disabling their retained manager. */
+    fun isSensorEnabledByRelease(sensorId: String): Boolean = enabledByRelease
+
     suspend fun checkPermission(context: Context, sensorId: String): Boolean {
+        if (!isSensorEnabledByRelease(sensorId)) return false
         return requiredPermissions(context, sensorId).all {
             if (sensorId != "last_used_app") {
                 context.checkPermission(it, myPid(), myUid()) == PackageManager.PERMISSION_GRANTED
@@ -108,6 +117,7 @@ interface SensorManager {
 
     /** @return `true` if this sensor is enabled on any server */
     suspend fun isEnabled(context: Context, basicSensor: BasicSensor): Boolean {
+        if (!isSensorEnabledByRelease(basicSensor.id)) return false
         val permission = checkPermission(context, basicSensor.id)
         return sensorDao(context).getAnyIsEnabled(
             basicSensor.id,
@@ -119,6 +129,7 @@ interface SensorManager {
 
     /** @return `true` if this sensor is enabled for the specified server */
     suspend fun isEnabled(context: Context, basicSensor: BasicSensor, serverId: Int): Boolean {
+        if (!isSensorEnabledByRelease(basicSensor.id)) return false
         val permission = checkPermission(context, basicSensor.id)
         return sensorDao(context).getOrDefault(
             basicSensor.id,
@@ -130,6 +141,7 @@ interface SensorManager {
 
     /** @return Set of server IDs for which this sensor is enabled */
     suspend fun getEnabledServers(context: Context, basicSensor: BasicSensor): Set<Int> {
+        if (!isSensorEnabledByRelease(basicSensor.id)) return emptySet()
         val permission = checkPermission(context, basicSensor.id)
         return sensorDao(context).get(basicSensor.id).filter { it.enabled && permission }.map { it.serverId }.toSet()
     }
@@ -245,6 +257,7 @@ interface SensorManager {
         attributes: Map<String, Any?>,
         forceUpdate: Boolean = false,
     ) = withContext(Dispatchers.Default) {
+        if (!isSensorEnabledByRelease(basicSensor.id)) return@withContext
         val sensorDao = sensorDao(context)
         val sensors = sensorDao.get(basicSensor.id)
         if (sensors.isEmpty()) return@withContext

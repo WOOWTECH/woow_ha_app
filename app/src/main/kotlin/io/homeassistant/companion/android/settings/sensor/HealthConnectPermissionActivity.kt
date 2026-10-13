@@ -4,10 +4,15 @@ import android.content.Intent
 import androidx.core.net.toUri
 import io.homeassistant.companion.android.BaseActivity
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.sensors.HealthSensorReleasePolicy
 
 class HealthConnectPermissionActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
+        if (!HealthSensorReleasePolicy.healthConnectEnabled) {
+            finish()
+            return
+        }
         if (
             intent.action == "androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" ||
             (

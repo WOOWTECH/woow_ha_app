@@ -14,7 +14,7 @@ private const val NAVIGATE_URL_PATH = "/navigate/"
 private const val MY_BASE_DOMAIN = "aiot.woowtech.io"
 private const val BASE_MY_REDIRECT_URL = "https://$MY_BASE_DOMAIN$REDIRECT_URL_PATH"
 
-private const val DEEP_LINK_SCHEME = "homeassistant"
+private const val DEEP_LINK_SCHEME = "woowtech"
 
 private const val INTERNAL_MY_REDIRECT_PREFIX = "_my_redirect/"
 
@@ -45,11 +45,11 @@ sealed interface LinkDestination {
 }
 
 /**
- * Handles universal links from `https://aiot.woowtech.io` and some of the deep links from `homeassistant://`
+ * Handles universal links from `https://aiot.woowtech.io` and some of the deep links from `woowtech://`
  */
 interface LinkHandler {
     /**
-     * Processes the given [uri] from `https://aiot.woowtech.io` or `homeassistant://` and determines the
+     * Processes the given [uri] from `https://aiot.woowtech.io` or `woowtech://` and determines the
      * intended navigation destination within the application.
      *
      * @param uri The universal link to handle.
@@ -93,7 +93,8 @@ class LinkHandlerImpl @Inject constructor(private val serverManager: ServerManag
         }
         return when {
             path.startsWith(REDIRECT_URL_PATH) -> handleRedirectLink(uri)
-            path.startsWith(INVITE_URL_PATH) -> handleInviteLink(uri)
+            path == INVITE_URL_PATH.removeSuffix("/") || path.startsWith(INVITE_URL_PATH) ->
+                handleInviteLink(uri)
             else -> {
                 FailFast.fail { "Unknown or invalid universal link: $uri" }
                 LinkDestination.NoDestination
@@ -117,7 +118,7 @@ class LinkHandlerImpl @Inject constructor(private val serverManager: ServerManag
      *
      * The expected invitation link format is:
      * Universal Link: `https://aiot.woowtech.io/invite#url=http://homeassistant.local:8123`
-     * Deep Link: `homeassistant://invite/#url=http://homeassistant.local:8123`
+     * Deep Link: `woowtech://invite/#url=http://homeassistant.local:8123`
      *
      * The target URL is embedded in the fragment for security reasons,
      * preventing it from being sent to `aiot.woowtech.io`. This function extracts the
@@ -176,7 +177,7 @@ class LinkHandlerImpl @Inject constructor(private val serverManager: ServerManag
     }
 
     /**
-     * Handles navigate deep links from `homeassistant://navigate/...`.
+     * Handles navigate deep links from `woowtech://navigate/...`.
      *
      * Supports server selection via the `server` query parameter:
      * - No parameter or `server=default`: Uses the default server

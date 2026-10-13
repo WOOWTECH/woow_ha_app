@@ -177,7 +177,7 @@ abstract class SensorReceiverBase : BroadcastReceiver() {
             return
         }
 
-        managers.forEach { manager ->
+        managers.filter { it.enabledByRelease }.forEach { manager ->
             val hasSensor = manager.hasSensor(context)
             if (hasSensor) {
                 try {
@@ -231,11 +231,12 @@ abstract class SensorReceiverBase : BroadcastReceiver() {
         var serverIsReachable = true
         val enabledRegistrations = mutableListOf<SensorRegistration<Any>>()
 
-        managers.forEach { manager ->
+        managers.filter { it.enabledByRelease }.forEach { manager ->
             // Each manager was already asked to update in updateSensors
             val hasSensor = manager.hasSensor(context)
 
             manager.getAvailableSensors(context).forEach sensorForEach@{ basicSensor ->
+                if (!manager.isSensorEnabledByRelease(basicSensor.id)) return@sensorForEach
                 val fullSensor = sensorDao.getFull(basicSensor.id, server.id).toSensorWithAttributes()
                 val sensor = fullSensor?.sensor ?: return@sensorForEach
                 val sensorCoreEnabled = coreSensorStatus?.get(basicSensor.id)
@@ -407,7 +408,8 @@ abstract class SensorReceiverBase : BroadcastReceiver() {
 
     private suspend fun updateSensor(context: Context, sensorId: String) {
         val sensorManager = managers.firstOrNull {
-            it.getAvailableSensors(context).any { s -> s.id == sensorId }
+            it.isSensorEnabledByRelease(sensorId) &&
+                it.getAvailableSensors(context).any { s -> s.id == sensorId }
         } ?: return
         try {
             sensorManager.requestSensorUpdate(context)

@@ -35,6 +35,7 @@ import io.homeassistant.companion.android.common.data.prefs.PrefsRepository
 import io.homeassistant.companion.android.common.notifications.DeviceCommandData
 import io.homeassistant.companion.android.common.sensors.SensorManager
 import io.homeassistant.companion.android.common.sensors.SensorReceiverBase
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.DisabledLocationHandler
 import io.homeassistant.companion.android.database.DatabaseEntryPoint
 import io.homeassistant.companion.android.database.location.LocationHistoryDao
@@ -1330,7 +1331,7 @@ class LocationSensorManager :
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/location"
+        return "${AppSupportLinks.SENSORS}#location"
     }
 
     override val name: Int

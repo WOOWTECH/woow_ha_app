@@ -13,7 +13,6 @@ import io.homeassistant.companion.android.database.server.ServerSessionInfo
 import io.homeassistant.companion.android.database.server.ServerUserInfo
 import io.homeassistant.companion.android.frontend.navigation.FrontendRoute
 import io.homeassistant.companion.android.onboarding.OnboardingRoute
-import io.homeassistant.companion.android.onboarding.WearOnboardingRoute
 import io.homeassistant.companion.android.testing.unit.ConsoleLogExtension
 import io.homeassistant.companion.android.testing.unit.MainDispatcherJUnit5Extension
 import io.mockk.coEvery
@@ -359,14 +358,14 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun `Given initial deep link is OpenWearOnboarding and full flavor, when creating viewModel, then navigate to wear onboarding`() = runTest {
+    fun `Given initial deep link is OpenWearOnboarding and full flavor, when creating viewModel, then show wear unsupported`() = runTest {
         createViewModel(
             initialDeepLink = LaunchActivity.DeepLink.OpenWearOnboarding("ha_wear", "http://ha"),
             hasLocationTrackingSupport = true,
         )
         advanceUntilIdle()
         assertEquals(
-            LaunchUiState.Ready(WearOnboardingRoute("ha_wear", "http://ha")),
+            LaunchUiState.WearUnsupported,
             viewModel.uiState.value,
         )
     }
@@ -532,7 +531,7 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun `Given initial deep link is OpenWearOnboarding with null url, when full flavor, then navigate to wear onboarding without url`() = runTest {
+    fun `Given initial deep link is OpenWearOnboarding with null url, when full flavor, then show wear unsupported`() = runTest {
         createViewModel(
             initialDeepLink = LaunchActivity.DeepLink.OpenWearOnboarding(wearName = "Pixel Watch", urlToOnboard = null),
             hasLocationTrackingSupport = true,
@@ -540,7 +539,7 @@ class LaunchViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            LaunchUiState.Ready(WearOnboardingRoute(wearName = "Pixel Watch", urlToOnboard = null)),
+            LaunchUiState.WearUnsupported,
             viewModel.uiState.value,
         )
     }

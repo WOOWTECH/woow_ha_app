@@ -18,6 +18,7 @@ import androidx.health.services.client.data.PassiveMonitoringCapabilities
 import androidx.health.services.client.data.UserActivityInfo
 import androidx.health.services.client.data.UserActivityState
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.sensors.HealthSensorReleasePolicy
 import io.homeassistant.companion.android.common.sensors.SensorManager
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import java.time.Instant
@@ -108,10 +109,14 @@ class HealthServicesSensorManager : SensorManager {
         return "https://aiot.woowtech.io/docs/wear-os/sensors#health-services"
     }
 
+    override val enabledByRelease: Boolean
+        get() = HealthSensorReleasePolicy.healthServicesEnabled
+
     override val name: Int
         get() = commonR.string.sensor_name_health_services
 
     override suspend fun getAvailableSensors(context: Context): List<SensorManager.BasicSensor> {
+        if (!enabledByRelease) return emptyList()
         latestContext = context
         if (healthClient == null) {
             healthClient = HealthServices.getClient(latestContext)
@@ -150,7 +155,7 @@ class HealthServicesSensorManager : SensorManager {
     }
 
     override fun requiredPermissions(context: Context, sensorId: String): Array<String> {
-        return if (areHealthServicesSensorApisAvailable) {
+        return if (enabledByRelease && areHealthServicesSensorApisAvailable) {
             arrayOf(Manifest.permission.ACTIVITY_RECOGNITION)
         } else {
             emptyArray()
@@ -158,15 +163,17 @@ class HealthServicesSensorManager : SensorManager {
     }
 
     override fun hasSensor(context: Context): Boolean {
-        return areHealthServicesSensorApisAvailable
+        return enabledByRelease && areHealthServicesSensorApisAvailable
     }
 
     override suspend fun requestSensorUpdate(context: Context) {
+        if (!enabledByRelease) return
         latestContext = context
         updateHealthServices()
     }
 
     private suspend fun updateHealthServices() {
+        if (!enabledByRelease) return
         val activityStateEnabled = isEnabled(latestContext, userActivityState)
         val dailyFloorEnabled = isEnabled(latestContext, dailyFloors)
         val dailyDistanceEnabled = isEnabled(latestContext, dailyDistance)
@@ -218,6 +225,7 @@ class HealthServicesSensorManager : SensorManager {
 
         val passiveListenerCallback: PassiveListenerCallback = object : PassiveListenerCallback {
             override fun onUserActivityInfoReceived(info: UserActivityInfo) {
+                if (!enabledByRelease) return
                 Timber.d("User activity state: ${info.userActivityState.name}")
                 ioScope.launch {
                     callbackLastUpdated = System.currentTimeMillis()
@@ -248,6 +256,7 @@ class HealthServicesSensorManager : SensorManager {
             }
 
             override fun onNewDataPointsReceived(dataPoints: DataPointContainer) {
+                if (!enabledByRelease) return
                 Timber.d("New data point received: ${dataPoints.dataTypes}")
                 callbackLastUpdated = System.currentTimeMillis()
                 val floorsDaily = dataPoints.getData(DataType.FLOORS_DAILY)
@@ -279,6 +288,7 @@ class HealthServicesSensorManager : SensorManager {
             }
 
             override fun onPermissionLost() {
+                if (!enabledByRelease) return
                 val sensorDao = sensorDao(latestContext)
                 runBlocking {
                     serverManager(latestContext).servers().forEach {
@@ -369,6 +379,7 @@ class HealthServicesSensorManager : SensorManager {
     }
 
     private fun processDataPoint(dataPoints: List<IntervalDataPoint<*>>, basicSensor: SensorManager.BasicSensor) {
+        if (!enabledByRelease) return
         var latest = 0
         var lastIndex = 0
         val bootInstant =

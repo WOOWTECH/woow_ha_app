@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
-private const val APPLICATION_ID = "com.woowtech.home"
+private const val APPLICATION_ID = "com.woowtech.aiot"
 private const val NAMESPACE = "io.homeassistant.companion.android"
 
 /**
@@ -24,9 +24,11 @@ private const val NAMESPACE = "io.homeassistant.companion.android"
  * A `release` signing configuration is automatically created. The keystore information can be
  * provided through the following environment variables:
  * - `KEYSTORE_PATH`: The path to the keystore file.
- * - `KEYSTORE_PASSWORD`: The password for the keystore.
+ * - `KEYSTORE_PASSWORD`: The password for the keystore (CI fallback).
+ * - `KEYSTORE_PASSWORD_FILE`: Optional password file, taking precedence over the CI fallback.
  * - `KEYSTORE_ALIAS`: The alias for the key within the keystore.
- * - `KEYSTORE_ALIAS_PASSWORD`: The password for the key alias.
+ * - `KEYSTORE_ALIAS_PASSWORD`: The password for the key alias (CI fallback).
+ * - `KEYSTORE_ALIAS_PASSWORD_FILE`: Optional alias password file, taking precedence over the CI fallback.
  */
 class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -60,9 +62,13 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 signingConfigs {
                     create("release") {
                         storeFile = file(System.getenv("KEYSTORE_PATH") ?: "release_keystore.keystore")
-                        storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+                        storePassword = System.getenv("KEYSTORE_PASSWORD_FILE")?.let {
+                            file(it).readText().trimEnd('\r', '\n')
+                        } ?: System.getenv("KEYSTORE_PASSWORD") ?: ""
                         keyAlias = System.getenv("KEYSTORE_ALIAS") ?: ""
-                        keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: ""
+                        keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD_FILE")?.let {
+                            file(it).readText().trimEnd('\r', '\n')
+                        } ?: System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: ""
                         enableV1Signing = true
                         enableV2Signing = true
                     }
@@ -76,6 +82,13 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         isDebuggable = false
                         isJniDebuggable = false
                         signingConfig = signingConfigs.getByName("release")
+                        // Ship a native symbol table inside the bundle so Play Console can
+                        // symbolicate native crashes and ANRs. SYMBOL_TABLE keeps function
+                        // names without the line tables that FULL would add, which is the
+                        // usual size/usefulness trade-off for a release build.
+                        ndk {
+                            debugSymbolLevel = "SYMBOL_TABLE"
+                        }
                     }
                 }
             }

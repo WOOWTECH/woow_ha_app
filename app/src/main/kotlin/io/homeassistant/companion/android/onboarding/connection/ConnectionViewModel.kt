@@ -97,7 +97,7 @@ internal sealed interface ConnectionNavigationEvent {
     data class OpenExternalLink(val url: Uri) : ConnectionNavigationEvent
 }
 
-private const val AUTH_CALLBACK_SCHEME = "homeassistant"
+private const val AUTH_CALLBACK_SCHEME = "woowtech"
 private const val AUTH_CALLBACK_HOST = "auth-callback"
 private const val AUTH_CALLBACK = "$AUTH_CALLBACK_SCHEME://$AUTH_CALLBACK_HOST"
 

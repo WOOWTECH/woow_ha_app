@@ -2,6 +2,12 @@ name: Production Deploy
 
 on: # yamllint disable-line rule:truthy
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Explicitly promote the approved beta to Play production"
+        type: boolean
+        required: true
+        default: false
   release:
     types: [released]
 
@@ -13,6 +19,7 @@ permissions:
 
 jobs:
   play_promote_production:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
     name: Play Publish Production
     runs-on: ubuntu-latest
     steps:

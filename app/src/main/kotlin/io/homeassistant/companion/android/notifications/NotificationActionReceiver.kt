@@ -11,6 +11,7 @@ import androidx.core.content.IntentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.data.servers.ServerManager
+import io.homeassistant.companion.android.common.notifications.NotificationData
 import io.homeassistant.companion.android.common.util.cancel
 import io.homeassistant.companion.android.database.notification.NotificationDao
 import io.homeassistant.companion.android.notifications.MessagingManager.Companion.KEY_TEXT_REPLY
@@ -69,7 +70,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     .sortedBy { it.key.substringAfter(MessagingManager.SOURCE_REPLY_HISTORY).toInt() }
                     .map { it.value } + replyText
                 messagingManager.handleMessage(
-                    replies
+                    notificationAction.data + replies
                         .takeLast(3)
                         .mapIndexed { index, text ->
                             "${MessagingManager.SOURCE_REPLY_HISTORY}$index" to text!!
@@ -100,7 +101,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
         when (intent.action) {
             FIRE_EVENT -> {
                 ioScope.launch {
-                    val serverId = notificationDao.get(databaseId.toInt())?.serverId ?: ServerManager.SERVER_ID_ACTIVE
+                    val serverId = resolveNotificationActionServerId(
+                        notificationDao = notificationDao,
+                        serverManager = serverManager,
+                        databaseId = databaseId,
+                        action = notificationAction,
+                    )
                     fireEvent(notificationAction, serverId, onComplete, onFailure)
                 }
             }
@@ -116,9 +122,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
         try {
             serverManager.integrationRepository(serverId).fireEvent(
                 "mobile_app_notification_action",
-                action.data
-                    .filter { !it.key.startsWith(MessagingManager.SOURCE_REPLY_HISTORY) }
-                    .plus(Pair("action", action.key)),
+                notificationActionEventData(action),
             )
             onComplete()
         } catch (e: Exception) {
@@ -127,3 +131,20 @@ class NotificationActionReceiver : BroadcastReceiver() {
         }
     }
 }
+
+/** Resolves the action's server even when its notification history row has been evicted. */
+internal suspend fun resolveNotificationActionServerId(
+    notificationDao: NotificationDao,
+    serverManager: ServerManager,
+    databaseId: Long,
+    action: NotificationAction,
+): Int = notificationDao.get(databaseId.toInt())?.serverId
+    ?: action.data[NotificationData.WEBHOOK_ID]?.let { webhookId ->
+        serverManager.getServer(webhookId = webhookId)?.id
+    }
+    ?: ServerManager.SERVER_ID_ACTIVE
+
+/** Keeps action data and replies intact while excluding local reply history from the event. */
+internal fun notificationActionEventData(action: NotificationAction): Map<String, String> = action.data
+    .filter { !it.key.startsWith(MessagingManager.SOURCE_REPLY_HISTORY) }
+    .plus(Pair("action", action.key))

@@ -6,6 +6,7 @@ import androidx.car.app.connection.CarConnection
 import androidx.lifecycle.Observer
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -25,10 +26,14 @@ class AndroidAutoSensorManager :
         )
     }
 
+    override val enabledByRelease: Boolean
+        get() = PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled
+
     override val name: Int
         get() = commonR.string.sensor_name_android_auto
 
     override suspend fun getAvailableSensors(context: Context): List<SensorManager.BasicSensor> {
+        if (!enabledByRelease) return emptyList()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             listOf(androidAutoConnected)
         } else {
@@ -37,10 +42,12 @@ class AndroidAutoSensorManager :
     }
 
     override fun hasSensor(context: Context): Boolean {
+        if (!enabledByRelease) return false
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
     }
 
     override fun requiredPermissions(context: Context, sensorId: String): Array<String> {
+        if (!enabledByRelease) return emptyArray()
         return emptyArray()
     }
 
@@ -48,6 +55,7 @@ class AndroidAutoSensorManager :
     private var carConnection: CarConnection? = null
 
     override suspend fun requestSensorUpdate(context: Context) {
+        if (!enabledByRelease) return
         this.context = context.applicationContext
         if (!isEnabled(context, androidAutoConnected)) {
             return
@@ -66,6 +74,7 @@ class AndroidAutoSensorManager :
     }
 
     override fun onChanged(value: Int) {
+        if (!enabledByRelease) return
         sensorWorkerScope.launch {
             if (!isEnabled(context, androidAutoConnected)) {
                 carConnection?.type?.removeObserver(this@AndroidAutoSensorManager)

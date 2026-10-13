@@ -5,6 +5,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.wearable.Wearable
 import io.homeassistant.companion.android.common.util.isAutomotive
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
@@ -15,7 +16,7 @@ object SettingsWearDetection {
      * if they have the Home Assistant app installed.
      */
     suspend fun hasAnyNodes(context: Context): Boolean {
-        if (context.isAutomotive()) return false
+        if (!PhoneIntegrationReleasePolicy.wearSetupEnabled || context.isAutomotive()) return false
         return try {
             val nodeClient = Wearable.getNodeClient(context)
             nodeClient.connectedNodes.await().any()

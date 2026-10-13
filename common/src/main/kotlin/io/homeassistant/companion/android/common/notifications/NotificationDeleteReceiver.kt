@@ -54,7 +54,11 @@ class NotificationDeleteReceiver : BroadcastReceiver() {
         ioScope.launch {
             try {
                 val databaseId = intent.getLongExtra(EXTRA_NOTIFICATION_DB, 0)
-                val serverId = notificationDao.get(databaseId.toInt())?.serverId ?: ServerManager.SERVER_ID_ACTIVE
+                val serverId = notificationDao.get(databaseId.toInt())?.serverId
+                    ?: (hashData[NotificationData.WEBHOOK_ID] as? String)?.let { webhookId ->
+                        serverManager.getServer(webhookId = webhookId)?.id
+                    }
+                    ?: ServerManager.SERVER_ID_ACTIVE
 
                 serverManager.integrationRepository(serverId).fireEvent("mobile_app_notification_cleared", hashData)
                 Timber.d("Notification cleared event successful!")

@@ -14,13 +14,21 @@ import io.homeassistant.companion.android.database.sensor.Sensor
 import io.homeassistant.companion.android.database.sensor.SensorDao
 import io.homeassistant.companion.android.sensors.SensorReceiver
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @HiltViewModel
-class SensorSettingsViewModel @Inject constructor(sensorDao: SensorDao, application: Application) :
-    AndroidViewModel(application) {
+class SensorSettingsViewModel internal constructor(
+    sensorDao: SensorDao,
+    application: Application,
+    private val ioDispatcher: CoroutineDispatcher,
+) : AndroidViewModel(application) {
+
+    @Inject
+    constructor(sensorDao: SensorDao, application: Application) : this(sensorDao, application, Dispatchers.IO)
 
     enum class SensorFilter(@IdRes val menuItemId: Int) {
         ALL(R.id.action_show_sensors_all),
@@ -33,7 +41,9 @@ class SensorSettingsViewModel @Inject constructor(sensorDao: SensorDao, applicat
         }
     }
 
-    private var sensorsList = emptyList<Sensor>()
+    // Null distinguishes the first emission, including an empty database, from an unchanged list.
+    private var sensorsList: List<Sensor>? = null
+    private var filterJob: Job? = null
     var sensors by mutableStateOf<Map<String, Sensor>>(emptyMap())
         private set
 
@@ -41,77 +51,77 @@ class SensorSettingsViewModel @Inject constructor(sensorDao: SensorDao, applicat
         private set
 
     var searchQuery: String? = null
+        private set
     var sensorFilter by mutableStateOf(SensorFilter.ALL)
         private set
 
     init {
         viewModelScope.launch {
             sensorDao.getAllFlow().collect {
-                withContext(Dispatchers.IO) {
-                    // Compare contents, because the worker typically pushes a DB update on
-                    // sensor updates even when contents don't change
-                    val different = sensorsList != it
+                // Sensor updates often emit unchanged contents. Keep filtering read-only.
+                if (sensorsList != it) {
                     sensorsList = it
-                    if (different) filterSensorsList()
+                    filterSensorsList()
                 }
             }
         }
     }
 
+    /** Updates the search immediately so menu recreation sees the latest query. */
     fun setSensorsSearchQuery(query: String? = "") {
-        viewModelScope.launch {
-            searchQuery = query
-            filterSensorsList()
-        }
+        searchQuery = query
+        filterSensorsList()
     }
 
+    /** Filters available sensors using observed state without changing opt-ins or checking permissions. */
     fun setSensorFilterChoice(@IdRes filterMenuItemId: Int) {
-        viewModelScope.launch {
-            sensorFilter = SensorFilter.menuItemIdToFilter.getValue(filterMenuItemId)
-            filterSensorsList()
+        sensorFilter = SensorFilter.menuItemIdToFilter.getValue(filterMenuItemId)
+        filterSensorsList()
+    }
+
+    private fun filterSensorsList() {
+        filterJob?.cancel()
+        val query = searchQuery.orEmpty()
+        val filter = sensorFilter
+        val rows = sensorsList.orEmpty()
+        filterJob = viewModelScope.launch {
+            val (filteredSensors, filteredManagers) = withContext(ioDispatcher) {
+                filterSensors(rows, query, filter)
+            }
+            // A cancelled older query must not overwrite a newer query or database emission.
+            sensors = filteredSensors
+            allSensors = filteredManagers
         }
     }
 
-    private suspend fun filterSensorsList() = withContext(Dispatchers.IO) {
+    private suspend fun filterSensors(
+        rows: List<Sensor>,
+        query: String,
+        filter: SensorFilter,
+    ): Pair<Map<String, Sensor>, Map<SensorManager, List<SensorManager.BasicSensor>>> {
         val app = getApplication<Application>()
-        val managers = SensorReceiver.MANAGERS.sortedBy { app.getString(it.name) }
-        sensors = SensorReceiver.MANAGERS
-            .filter { it.hasSensor(app.applicationContext) }
-            .flatMap { manager ->
-                manager.getAvailableSensors(app.applicationContext)
-                    .filter { sensor ->
-                        (
-                            searchQuery.isNullOrEmpty() ||
-                                (
-                                    app.getString(sensor.name).contains(searchQuery!!, true) ||
-                                        app.getString(manager.name).contains(searchQuery!!, true)
-                                    )
-                            ) &&
-                            (
-                                sensorFilter == SensorFilter.ALL ||
-                                    (
-                                        sensorFilter == SensorFilter.ENABLED &&
-                                            manager.isEnabled(app.applicationContext, sensor)
-                                        ) ||
-                                    (
-                                        sensorFilter == SensorFilter.DISABLED &&
-                                            !manager.isEnabled(app.applicationContext, sensor)
-                                        )
-                                )
+        // Enabled on any server wins. Sensors without rows remain discoverable as disabled.
+        val displayedRows = rows.groupBy { it.id }.mapValues { (_, sensors) -> sensors.maxBy { it.enabled } }
+        val filteredSensors = mutableMapOf<String, Sensor>()
+        val filteredManagers = SensorReceiver.MANAGERS
+            .filter { it.enabledByRelease && it.hasSensor(app) }
+            .sortedBy { app.getString(it.name) }
+            .associateWith { manager ->
+                manager.getAvailableSensors(app).filter { basicSensor ->
+                    val row = displayedRows[basicSensor.id]
+                    val matchesQuery = query.isEmpty() ||
+                        app.getString(basicSensor.name).contains(query, ignoreCase = true) ||
+                        app.getString(manager.name).contains(query, ignoreCase = true)
+                    val matchesFilter = when (filter) {
+                        SensorFilter.ALL -> true
+                        SensorFilter.ENABLED -> row?.enabled == true
+                        SensorFilter.DISABLED -> row?.enabled != true
                     }
-                    .mapNotNull { sensor ->
-                        sensorsList.filter { it.id == sensor.id }
-                            .maxByOrNull { it.enabled } // If any server is enabled, show the value
-                    }
+                    val include = manager.isSensorEnabledByRelease(basicSensor.id) && matchesQuery && matchesFilter
+                    if (include && row != null) filteredSensors[basicSensor.id] = row
+                    include
+                }.sortedBy { app.getString(it.name) }.distinct()
             }
-            .associateBy { it.id }
-
-        allSensors = managers.associateWith { manager ->
-            manager.getAvailableSensors(app)
-                .filter { basicSensor ->
-                    sensors.containsKey(basicSensor.id)
-                }
-                .sortedBy { app.getString(it.name) }.distinct()
-        }
+        return filteredSensors to filteredManagers
     }
 }

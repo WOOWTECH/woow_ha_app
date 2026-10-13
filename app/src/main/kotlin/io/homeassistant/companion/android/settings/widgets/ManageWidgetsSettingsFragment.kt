@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.settings.addHelpMenuProvider
 import io.homeassistant.companion.android.settings.widgets.views.ManageWidgetsView
 import io.homeassistant.companion.android.util.compose.HomeAssistantAppTheme
@@ -29,7 +30,7 @@ class ManageWidgetsSettingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://aiot.woowtech.io/docs/integrations/android-widgets")
+        addHelpMenuProvider("${AppSupportLinks.WIDGETS}#android-widgets")
     }
 
     override fun onResume() {

@@ -42,6 +42,7 @@ import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.response.ReadRecordsResponse
 import androidx.health.connect.client.time.TimeRangeFilter
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.sensors.HealthSensorReleasePolicy
 import io.homeassistant.companion.android.common.sensors.SensorManager
 import io.homeassistant.companion.android.common.util.FailFast
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
@@ -59,10 +60,20 @@ import timber.log.Timber
 
 class HealthConnectSensorManager : SensorManager {
     companion object {
-        fun getPermissionIntent(): Intent? = Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS)
+        /** Returns the settings intent only in releases that allow Health Connect. */
+        fun getPermissionIntent(): Intent? = if (HealthSensorReleasePolicy.healthConnectEnabled) {
+            Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS)
+        } else {
+            null
+        }
 
+        /** Returns a permission contract only in releases that allow Health Connect. */
         fun getPermissionResultContract(): ActivityResultContract<Set<String>, Set<String>>? =
-            PermissionController.createRequestPermissionResultContract()
+            if (HealthSensorReleasePolicy.healthConnectEnabled) {
+                PermissionController.createRequestPermissionResultContract()
+            } else {
+                null
+            }
 
         val activeCaloriesBurned = SensorManager.BasicSensor(
             id = "health_connect_active_calories_burned",
@@ -377,10 +388,14 @@ class HealthConnectSensorManager : SensorManager {
         )
     }
 
+    override val enabledByRelease: Boolean
+        get() = HealthSensorReleasePolicy.healthConnectEnabled
+
     override val name: Int
         get() = commonR.string.sensor_name_health_connect
 
     override fun requiredPermissions(context: Context, sensorId: String): Array<String> {
+        if (!enabledByRelease) return emptyArray()
         return FailFast.failOnCatch({ "Unable to get required permissions for $sensorId" }, emptyArray<String>()) {
             val permissions = sensorPermissionMap[sensorId]?.let { recordClass ->
                 val readPermission = HealthPermission.getReadPermission(recordClass)
@@ -399,6 +414,7 @@ class HealthConnectSensorManager : SensorManager {
     }
 
     override suspend fun requestSensorUpdate(context: Context) {
+        if (!enabledByRelease) return
         if (isEnabled(context, activeCaloriesBurned)) {
             updateActiveCaloriesBurnedSensor(context)
         }
@@ -984,7 +1000,7 @@ class HealthConnectSensorManager : SensorManager {
     }
 
     override fun hasSensor(context: Context): Boolean {
-        return HealthConnectClient.getSdkStatus(context) == HealthConnectClient.SDK_AVAILABLE
+        return enabledByRelease && HealthConnectClient.getSdkStatus(context) == HealthConnectClient.SDK_AVAILABLE
     }
 
     override suspend fun checkPermission(context: Context, sensorId: String): Boolean {
@@ -1000,6 +1016,7 @@ class HealthConnectSensorManager : SensorManager {
     }
 
     private fun getOrCreateHealthConnectClient(context: Context): HealthConnectClient? {
+        if (!enabledByRelease) return null
         return try {
             HealthConnectClient.getOrCreate(context.applicationContext)
         } catch (e: RuntimeException) {

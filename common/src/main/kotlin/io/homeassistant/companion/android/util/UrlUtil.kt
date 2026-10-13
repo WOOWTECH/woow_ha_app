@@ -14,6 +14,10 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
+private const val BRANDED_NFC_TAG_HOST = "aiot.woowtech.io"
+private const val LEGACY_NFC_TAG_HOST = "www.home-assistant.io"
+private const val NFC_TAG_PATH = "tag"
+
 object UrlUtil {
     fun formattedUrlString(url: String): String {
         return if (url == "") {
@@ -51,11 +55,11 @@ object UrlUtil {
      * @param input The URL string to resolve. Supported formats:
      *   - Absolute URL (http://... or https://...)
      *   - Relative path to be resolved against base
-     *   - Deep link URL with homeassistant://navigate/ prefix
+     *   - Deep link URL with woowtech://navigate/ prefix
      * @return The resolved URL, the base URL if input is invalid, or null if resolution fails
      */
     fun handle(base: URL?, input: String): URL? {
-        val normalizedInput = input.removePrefix("homeassistant://navigate/")
+        val normalizedInput = input.removePrefix("woowtech://navigate/")
 
         val uri = try {
             URI(normalizedInput)
@@ -113,12 +117,47 @@ object UrlUtil {
             userInfo == other.userInfo
     }
 
-    fun splitNfcTagId(it: Uri?): String? {
-        val matches =
-            Regex("^https?://www\\.home-assistant\\.io/tag/(.*)").find(
-                it.toString(),
-            )
-        return matches?.groups?.get(1)?.value
+    /** Returns an NFC tag identifier only for an exact branded or legacy HTTPS tag URL. */
+    fun splitNfcTagId(uri: Uri?): String? {
+        if (uri == null ||
+            !uri.scheme.equals("https", ignoreCase = true) ||
+            listOf(BRANDED_NFC_TAG_HOST, LEGACY_NFC_TAG_HOST).none { host ->
+                uri.host.equals(host, ignoreCase = true)
+            } ||
+            uri.port != -1 ||
+            uri.userInfo != null ||
+            uri.query != null ||
+            uri.fragment != null
+        ) {
+            return null
+        }
+
+        val pathSegments = uri.pathSegments
+        val identifier = pathSegments.getOrNull(1)
+        return identifier?.takeIf {
+            pathSegments.size == 2 &&
+                pathSegments[0] == NFC_TAG_PATH &&
+                it.isNotBlank() &&
+                '/' !in it &&
+                it.none { character -> character.isISOControl() }
+        }
+    }
+
+    /** Builds the canonical branded URL written to a new NFC tag. */
+    fun buildNfcTagUri(identifier: String): Uri {
+        require(
+            identifier.isNotBlank() &&
+                '/' !in identifier &&
+                identifier.none { character -> character.isISOControl() },
+        ) {
+            "Invalid NFC tag identifier"
+        }
+        return Uri.Builder()
+            .scheme("https")
+            .authority(BRANDED_NFC_TAG_HOST)
+            .appendPath(NFC_TAG_PATH)
+            .appendPath(identifier)
+            .build()
     }
 }
 

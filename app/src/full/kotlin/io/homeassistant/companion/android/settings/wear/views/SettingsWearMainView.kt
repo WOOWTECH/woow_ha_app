@@ -3,14 +3,17 @@ package io.homeassistant.companion.android.settings.wear.views
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.wearable.Node
 import dagger.hilt.android.AndroidEntryPoint
+import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.onboarding.WearOnboardApp
 import io.homeassistant.companion.android.settings.wear.SettingsWearViewModel
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import io.homeassistant.companion.android.util.enableEdgeToEdgeCompat
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -43,6 +46,11 @@ class SettingsWearMainView : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!PhoneIntegrationReleasePolicy.wearSetupEnabled) {
+            Toast.makeText(this, commonR.string.phone_integration_unavailable, Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
 
         enableEdgeToEdgeCompat()
 
@@ -76,6 +84,7 @@ class SettingsWearMainView : AppCompatActivity() {
     }
 
     private fun onOnboardingComplete(result: WearOnboardApp.Output?) {
+        if (!PhoneIntegrationReleasePolicy.wearSetupEnabled) return
         result?.apply {
             settingsWearViewModel.sendAuthToWear(
                 url,

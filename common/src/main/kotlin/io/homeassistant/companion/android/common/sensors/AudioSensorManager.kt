@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 
 class AudioSensorManager : SensorManager {
@@ -146,7 +147,7 @@ class AudioSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#audio-sensors"
+        return "${AppSupportLinks.SENSORS}#audio-sensors"
     }
 
     override val name: Int

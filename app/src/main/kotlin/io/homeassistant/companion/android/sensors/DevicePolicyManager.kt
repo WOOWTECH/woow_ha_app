@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import io.homeassistant.companion.android.common.R
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 
 class DevicePolicyManager : SensorManager {
     companion object {
@@ -18,7 +19,7 @@ class DevicePolicyManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#work-profile-sensor"
+        return "${AppSupportLinks.SENSORS}#work-profile-sensor"
     }
 
     private var isManagedProfileAvailable: Boolean? = null

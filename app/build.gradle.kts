@@ -11,8 +11,7 @@ android {
     useLibrary("android.car")
 
     defaultConfig {
-        manifestPlaceholders["sentryRelease"] = "$applicationId@$versionName"
-        manifestPlaceholders["sentryDsn"] = System.getenv("SENTRY_DSN") ?: ""
+        buildConfigField("boolean", "IS_AUTOMOTIVE_APP", "false")
 
         bundle {
             language {
@@ -25,6 +24,15 @@ android {
     lint {
         // Until we fully migrate to Material3 this lint issue is too verbose https://github.com/home-assistant/android/issues/5420
         disable += listOf("UsingMaterialAndMaterial3Libraries")
+    }
+}
+
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        // Phone release marketing version, independent of Reckon and flavor suffixes.
+        variant.outputs.forEach { output ->
+            output.versionName.set("1.0")
+        }
     }
 }
 
@@ -42,4 +50,12 @@ dependencies {
 // Disable to fix memory leak and be compatible with the configuration cache.
 googleServices {
     disableVersionCheck = true
+}
+
+// Only full variants use Firebase; minimal has no registered Google client.
+// Keep the plugin's full-variant processing without requiring a fake minimal mapping.
+tasks.withType<com.google.gms.googleservices.GoogleServicesTask>().configureEach {
+    if (name.startsWith("processMinimal")) {
+        enabled = false
+    }
 }

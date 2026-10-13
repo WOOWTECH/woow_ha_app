@@ -14,6 +14,7 @@ import io.homeassistant.companion.android.testing.unit.ConsoleLogRule
 import io.homeassistant.companion.android.testing.unit.stringResource
 import org.junit.Rule
 import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -31,6 +32,38 @@ class WelcomeScreenTest {
 
     @get:Rule(order = 2)
     val composeTestRule = createAndroidComposeRule<HiltComponentActivity>()
+
+    @Test
+    @Config(qualifiers = "en")
+    fun `Given English when opening welcome then resolved copy uses aiot name`() {
+        assertBrandedWelcomeCopy(
+            expectedDetails = "Access your woowtech aiot server on the go.\n\nwoowtech aiot puts privacy and security first and runs locally in your home.",
+            expectedConnect = "Connect to my woowtech aiot",
+        )
+    }
+
+    @Test
+    @Config(qualifiers = "zh-rTW")
+    fun `Given Traditional Chinese when opening welcome then resolved copy uses aiot name`() {
+        assertBrandedWelcomeCopy(
+            expectedDetails = "隨時隨地存取您的 woowtech aiot 伺服器。\n\nwoowtech aiot 倡導隱私資安保護並於您的家中進行本地端運行。",
+            expectedConnect = "連線至我的 woowtech aiot",
+        )
+    }
+
+    private fun assertBrandedWelcomeCopy(expectedDetails: String, expectedConnect: String) {
+        composeTestRule.apply {
+            assertEquals("woowtech aiot app", activity.getString(commonR.string.welcome_home_assistant_title))
+            assertEquals(expectedDetails, activity.getString(commonR.string.welcome_details))
+            assertEquals(expectedConnect, activity.getString(commonR.string.welcome_connect_to_ha))
+            setContent {
+                WelcomeScreen(onConnectClick = {}, onLearnMoreClick = {})
+            }
+            onNodeWithText("woowtech aiot app").assertIsDisplayed()
+            onNodeWithText(expectedDetails).performScrollTo().assertIsDisplayed()
+            onNodeWithText(expectedConnect).performScrollTo().assertIsDisplayed()
+        }
+    }
 
     @Test
     fun `Given WelcomeScreen when click on buttons then triggers callbacks`() {

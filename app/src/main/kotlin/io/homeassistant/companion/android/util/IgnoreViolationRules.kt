@@ -1,5 +1,6 @@
 package io.homeassistant.companion.android.util
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.strictmode.DiskReadViolation
 import android.os.strictmode.DiskWriteViolation
@@ -359,6 +360,8 @@ private data object IgnoreAppCompatPersistLocalesDiskReadWrite : IgnoreViolation
  * beyond application control.
  */
 private data object IgnoreChromiumKeyStoreDiskWrite : IgnoreViolationRule {
+    // Shared with the phone app (minSdk 23); Automotive alone has minSdk 28.
+    @SuppressLint("ObsoleteSdkInt")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun shouldIgnore(violation: Violation): Boolean {
         if (violation !is DiskWriteViolation) return false
@@ -392,6 +395,8 @@ private data object IgnoreChromiumKeyStoreDiskWrite : IgnoreViolationRule {
  * beyond application control.
  */
 private data object IgnoreMediatekFrameworkDiskAccess : IgnoreViolationRule {
+    // Shared with the phone app (minSdk 23); Automotive alone has minSdk 28.
+    @SuppressLint("ObsoleteSdkInt")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun shouldIgnore(violation: Violation): Boolean {
         if (violation !is DiskReadViolation && violation !is DiskWriteViolation) return false

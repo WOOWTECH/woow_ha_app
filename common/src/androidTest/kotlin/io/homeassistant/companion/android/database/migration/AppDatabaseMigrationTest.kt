@@ -7,6 +7,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import io.homeassistant.companion.android.database.AppDatabase
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,13 +33,37 @@ class AppDatabaseMigrationTest {
         AppDatabase::class.java,
     )
 
-    /**
-     * Tests the full migration path from the earliest available schema (v24) to the latest.
-     *
-     * Note: Schema files for versions 1-23 were not exported when those versions were developed.
-     * Some tables (like Authentication_List) were added as Room entities without migrations,
-     * making it impossible to reconstruct earlier schemas. The earliest testable version is 24.
-     */
+    /** Verifies that upgrading legacy history retains the newest 500 rows deterministically. */
+    @Test
+    fun oversizedVersion51HistoryRetainsNewest500AfterMigration() {
+        helper.createDatabase(testDbName, 51).use { db ->
+            repeat(502) {
+                db.execSQL(
+                    "INSERT INTO notification_history (received, message, data, source, server_id) " +
+                        "VALUES (1000, 'message', '{}', 'FCM', 1)",
+                )
+            }
+        }
+
+        val database = Room.databaseBuilder(context, AppDatabase::class.java, testDbName)
+            .addMigrations(*migrationPath(context))
+            .build()
+
+        try {
+            database.openHelper.writableDatabase.query(
+                "SELECT id FROM notification_history ORDER BY received DESC, id DESC",
+            ).use { cursor ->
+                assertEquals("notification history should be capped at 500 rows", 500, cursor.count)
+                assertTrue("newest tied row must exist", cursor.moveToFirst())
+                assertEquals("newest tied row should be retained", 502, cursor.getInt(0))
+                assertTrue("oldest retained row must exist", cursor.moveToLast())
+                assertEquals("oldest tied rows should be pruned", 3, cursor.getInt(0))
+            }
+        } finally {
+            database.close()
+        }
+    }
+
     @Test
     fun migrateFromVersion24ToLatest() {
         // Create database at version 24 - the earliest version with an exported schema

@@ -1,26 +1,40 @@
 package io.homeassistant.companion.android.common.data.integration.impl
 
+import io.homeassistant.companion.android.common.BuildConfig
 import io.homeassistant.companion.android.common.data.LocalStorage
+import io.homeassistant.companion.android.common.data.integration.DeviceRegistration
 import io.homeassistant.companion.android.common.data.integration.IntegrationRepository
 import io.homeassistant.companion.android.common.data.integration.impl.IntegrationRepositoryImpl.Companion.PREF_ASK_NOTIFICATION_PERMISSION
+import io.homeassistant.companion.android.common.data.integration.impl.entities.RegisterDeviceRequest
 import io.homeassistant.companion.android.common.data.servers.ServerConnectionStateProvider
 import io.homeassistant.companion.android.common.data.servers.ServerManager
+import io.homeassistant.companion.android.common.data.servers.UrlState
+import io.homeassistant.companion.android.common.util.AppVersion
+import io.homeassistant.companion.android.common.util.MessagingToken
+import io.homeassistant.companion.android.common.util.kotlinJsonMapper
 import io.homeassistant.companion.android.database.server.Server
 import io.homeassistant.companion.android.database.server.ServerConnectionInfo
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
+import java.io.IOException
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class IntegrationRepositoryImplTest {
 
@@ -42,6 +56,37 @@ class IntegrationRepositoryImplTest {
         coEvery { connectionStateProvider.getApiUrls() } returns listOf("http://homeassistant:8123".toHttpUrl())
 
         repository = IntegrationRepositoryImpl(integrationService, serverManager, serverID, localStorage, "", "", "", "")
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["2026.1.7-full (1)", "2026.1.7-minimal (1)", "2026.1.7 (2)", "2026.1.7-full (4)"])
+    fun `Given a device registration when sending then payload uses brand identity and preserves version and push configuration`(version: String) = runTest {
+        val request = slot<RegisterDeviceRequest>()
+        val transportFailure = IOException("Test transport unavailable")
+        coEvery { localStorage.getString(any()) } returns null
+        every { server.deviceName } returns "Test device"
+        every { connectionStateProvider.urlFlow() } returns flowOf(UrlState.HasUrl("https://example.com".toHttpUrl().toUrl()))
+        coEvery { serverManager.authenticationRepository(serverID).buildBearerToken() } returns "test-bearer"
+        coEvery { integrationService.registerDevice(any(), any(), capture(request)) } throws transportFailure
+
+        val result = runCatching {
+            repository.registerDevice(
+                DeviceRegistration(
+                    appVersion = AppVersion.from(rawVersion = version),
+                    pushToken = MessagingToken("test-push-token"),
+                ),
+            )
+        }
+
+        assertEquals(transportFailure, result.exceptionOrNull())
+        val payload = kotlinJsonMapper.encodeToJsonElement(request.captured).jsonObject
+        assertEquals(JsonPrimitive("com.woowtech.aiot"), payload["app_id"])
+        assertEquals(JsonPrimitive("woowtech aiot"), payload["app_name"])
+        assertEquals(JsonPrimitive(version), payload["app_version"])
+        assertEquals(JsonPrimitive("Android"), payload["os_name"])
+        assertEquals(BuildConfig.PUSH_URL, request.captured.appData?.get("push_url"))
+        assertEquals(MessagingToken("test-push-token"), request.captured.appData?.get("push_token"))
+        assertEquals(true, request.captured.appData?.get("push_websocket_channel"))
     }
 
     @Test

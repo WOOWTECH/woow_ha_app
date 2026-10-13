@@ -20,6 +20,7 @@ import io.homeassistant.companion.android.common.sensors.BatterySensorManager
 import io.homeassistant.companion.android.common.sensors.BluetoothSensorManager
 import io.homeassistant.companion.android.common.sensors.DNDSensorManager
 import io.homeassistant.companion.android.common.sensors.DisplaySensorManager
+import io.homeassistant.companion.android.common.sensors.HealthSensorReleasePolicy
 import io.homeassistant.companion.android.common.sensors.KeyguardSensorManager
 import io.homeassistant.companion.android.common.sensors.LastRebootSensorManager
 import io.homeassistant.companion.android.common.sensors.LastUpdateManager
@@ -51,7 +52,7 @@ class SensorReceiver : SensorReceiverBase() {
         get() = MANAGERS
 
     companion object {
-        val MANAGERS = listOf(
+        val MANAGERS = listOfNotNull(
             AndroidOsSensorManager(),
             AppSensorManager(),
             AudioSensorManager(),
@@ -60,7 +61,7 @@ class SensorReceiver : SensorReceiverBase() {
             BluetoothSensorManager(),
             DisplaySensorManager(),
             DNDSensorManager(),
-            HealthServicesSensorManager(),
+            if (HealthSensorReleasePolicy.healthServicesEnabled) HealthServicesSensorManager() else null,
             HeartRateSensorManager(),
             KeyguardSensorManager(),
             LastRebootSensorManager(),
@@ -75,7 +76,7 @@ class SensorReceiver : SensorReceiverBase() {
             PowerSensorManager(),
             PressureSensorManager(),
             ProximitySensorManager(),
-            StepsSensorManager(),
+            StepsSensorManager(enabledByRelease = true),
             StorageSensorManager(),
             TheaterModeSensorManager(),
             TimeZoneManager(),

@@ -116,7 +116,7 @@ class NfcSetupActivity : BaseActivity() {
                     }
                 } else {
                     try {
-                        val nfcTagUrl = "https://aiot.woowtech.io/tag/$nfcTagToWriteUUID"
+                        val nfcTagUrl = UrlUtil.buildNfcTagUri(nfcTagToWriteUUID!!).toString()
                         NFCUtil.createNFCMessage(nfcTagUrl, intent)
                         Timber.d("Wrote nfc tag with url: $nfcTagUrl")
 

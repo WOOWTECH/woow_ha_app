@@ -6,6 +6,7 @@ import android.net.NetworkCapabilities
 import android.net.TrafficStats
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import java.math.RoundingMode
 import kotlin.math.absoluteValue
 import timber.log.Timber
@@ -58,7 +59,7 @@ class TrafficStatsManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#traffic-stats-sensor"
+        return "${AppSupportLinks.SENSORS}#traffic-stats-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_traffic_stats

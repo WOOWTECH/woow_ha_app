@@ -9,8 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 
 class ThreadManagerImpl @Inject constructor() : ThreadManager {
 
-    // Thread support currently depends on Google Play Services,
-    // and as a result Thread is not supported with the minimal flavor
+    // This product does not expose Thread support, including in the full Google/FCM build.
 
     override fun appSupportsThread(): Boolean = false
 
@@ -33,7 +32,7 @@ class ThreadManagerImpl @Inject constructor() : ThreadManager {
     ) { }
 
     override suspend fun getPreferredDatasetFromDevice(context: Context): IntentSender? {
-        throw IllegalStateException("Thread is not supported with the minimal flavor")
+        throw IllegalStateException("Thread is not supported in woowtech aiot")
     }
 
     override suspend fun sendThreadDatasetExportResult(result: ActivityResult, serverId: Int): String? = null

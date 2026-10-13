@@ -3,6 +3,7 @@ package io.homeassistant.companion.android.common.sensors
 import android.content.Context
 import android.nfc.NfcAdapter
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 
 class NfcSensorManager : SensorManager {
     companion object {
@@ -17,7 +18,7 @@ class NfcSensorManager : SensorManager {
         )
     }
 
-    override fun docsLink() = "https://aiot.woowtech.io/docs/core/sensors#nfc-state-sensor"
+    override fun docsLink() = "${AppSupportLinks.SENSORS}#nfc-state-sensor"
     override val name = commonR.string.sensor_name_nfc
 
     override suspend fun getAvailableSensors(context: Context) = listOf(nfcStateSensor)

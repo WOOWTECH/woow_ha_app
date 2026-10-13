@@ -30,6 +30,7 @@ import io.homeassistant.companion.android.BuildConfig
 import io.homeassistant.companion.android.R
 import io.homeassistant.companion.android.authenticator.Authenticator
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.isAutomotive
 import io.homeassistant.companion.android.common.util.isIgnoringBatteryOptimizations
 import io.homeassistant.companion.android.common.util.maybeAskForIgnoringBatteryOptimizations
@@ -51,6 +52,7 @@ import io.homeassistant.companion.android.settings.vehicle.ManageAndroidAutoSett
 import io.homeassistant.companion.android.settings.wear.SettingsWearActivity
 import io.homeassistant.companion.android.settings.wear.SettingsWearDetection
 import io.homeassistant.companion.android.settings.widgets.ManageWidgetsSettingsFragment
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import io.homeassistant.companion.android.util.QuestUtil
 import io.homeassistant.companion.android.util.applyBottomSafeDrawingInsets
 import io.homeassistant.companion.android.webview.WebViewActivity
@@ -309,13 +311,10 @@ class SettingsFragment(private val presenter: SettingsPresenter, private val lan
                 }
             }
         }
-        findPreference<SwitchPreference>("crash_reporting")?.let {
-            it.isVisible = BuildConfig.FLAVOR == "full"
-        }
-
         lifecycleScope.launch {
             findPreference<Preference>("wear_settings")?.let {
-                it.isVisible = SettingsWearDetection.hasAnyNodes(requireContext())
+                it.isVisible = PhoneIntegrationReleasePolicy.wearSetupEnabled &&
+                    SettingsWearDetection.hasAnyNodes(requireContext())
                 it.setOnPreferenceClickListener {
                     startActivity(SettingsWearActivity.newInstance(requireContext()))
                     return@setOnPreferenceClickListener true
@@ -323,8 +322,8 @@ class SettingsFragment(private val presenter: SettingsPresenter, private val lan
             }
         }
 
-        findPreference<Preference>("changelog_github")?.let {
-            val link = "https://aiot.woowtech.io/"
+        findPreference<Preference>("docs")?.let {
+            val link = AppSupportLinks.GETTING_STARTED
             it.summary = link
             it.intent = Intent(Intent.ACTION_VIEW, link.toUri())
         }
@@ -376,6 +375,7 @@ class SettingsFragment(private val presenter: SettingsPresenter, private val lan
 
         findPreference<PreferenceCategory>("android_auto")?.let {
             it.isVisible =
+                PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
                 (BuildConfig.FLAVOR == "full" || isAutomotive)
             if (isAutomotive) {

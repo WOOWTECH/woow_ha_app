@@ -13,6 +13,7 @@ import io.homeassistant.companion.android.common.data.prefs.PrefsRepository
 import io.homeassistant.companion.android.common.data.servers.ServerManager
 import io.homeassistant.companion.android.common.util.FailFast
 import io.homeassistant.companion.android.common.util.isAutomotive
+import io.homeassistant.companion.android.util.PhoneIntegrationReleasePolicy
 import io.homeassistant.companion.android.util.QuestUtil
 import io.homeassistant.companion.android.util.vehicle.isVehicleDomain
 import io.homeassistant.companion.android.widgets.camera.CameraWidgetConfigureActivity
@@ -97,7 +98,10 @@ class EntityAddToHandler @Inject constructor(
                         }
                     }
 
-                    if (isVehicleDomain(entity) && (isFullFlavor || isAutomotive)) {
+                    if (PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled &&
+                        isVehicleDomain(entity) &&
+                        (isFullFlavor || isAutomotive)
+                    ) {
                         // We could check if it already exist but the action won't do anything so we can keep it
                         actions.add(EntityAddToAction.AndroidAutoFavorite)
                     }
@@ -126,6 +130,10 @@ class EntityAddToHandler @Inject constructor(
     ) {
         when (action) {
             is EntityAddToAction.AndroidAutoFavorite -> {
+                if (!PhoneIntegrationReleasePolicy.vehicleIntegrationEnabled) {
+                    onShowSnackbar(context.getString(commonR.string.phone_integration_unavailable), null)
+                    return
+                }
                 addToAndroidAutoFavorite(entityId)
                 onShowSnackbar(context.getString(commonR.string.add_to_android_auto_success), null)
             }

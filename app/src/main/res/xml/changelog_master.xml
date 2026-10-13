@@ -2,16 +2,29 @@
 <changelog xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingDefaultResource">
     <release version="2026.1.7 - Main" versioncode="3">
+        <change>Rebranded as woowtech aiot with a new app identity and sign-in callback</change>
+        <change>Updated woowtech aiot welcome and interface labels with shared iOS wording; Traditional Chinese app label is 渥屋科技</change>
+        <change>Updated setup, sensor, widget, notification and shortcut help links and contact support</change>
+        <change>Disabled native Matter commissioning and Thread credential sharing</change>
+        <change>Disabled Health Connect sensors and permission requests for this release</change>
+        <change>Disabled phone activity recognition and steps, in addition to sleep sensors; barometer and other device sensors remain available</change>
+        <change>Disabled phone Android Auto sensors, favorites and Wear setup, including saved setup entries; standalone Automotive is unchanged</change>
+        <change>Preserved sensor search through menu refresh and filter changes without changing sensor opt-ins</change>
         <change>Redesigned onboarding experience for easier server setup</change>
         <change>Added connection security level options</change>
         <change>Support streaming text-to-speech in Assist</change>
         <change>Bug fixes and dependency updates</change>
     </release>
     <release version="2026.1.7 - Wear" versioncode="2">
+        <change>Rebranded as woowtech aiot and updated phone sign-in links</change>
+        <change>Disabled HealthServices sensors for this release; other sensor integrations are unchanged</change>
         <change>Support streaming text-to-speech in Assist</change>
         <change>Bug fixes and dependency updates</change>
     </release>
     <release version="2026.1.7 - Automotive" versioncode="1">
+        <change>Rebranded as woowtech aiot with updated sign-in and support links</change>
+        <change>Disabled Health Connect sensors and permission requests for this release</change>
+        <change>Disabled native Matter commissioning and Thread credential sharing</change>
         <change>Redesigned onboarding experience for easier server setup</change>
         <change>Added connection security level options</change>
         <change>Support streaming text-to-speech in Assist</change>

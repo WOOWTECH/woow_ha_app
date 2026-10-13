@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.settings.SettingViewModel
 import io.homeassistant.companion.android.settings.SettingViewModel.Companion.DEFAULT_UPDATE_FREQUENCY
 import io.homeassistant.companion.android.settings.addHelpMenuProvider
@@ -39,7 +40,7 @@ class SensorUpdateFrequencyFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addHelpMenuProvider("https://aiot.woowtech.io/docs/core/sensors#android-sensors")
+        addHelpMenuProvider("${AppSupportLinks.SENSORS}#android-sensors")
     }
 
     override fun onResume() {

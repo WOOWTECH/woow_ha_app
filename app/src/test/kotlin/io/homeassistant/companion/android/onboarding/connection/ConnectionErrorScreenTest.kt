@@ -100,19 +100,11 @@ class ConnectionErrorScreenTest {
 
             onNodeWithContentDescription(stringResource(commonR.string.connection_error_documentation_content_description))
                 .performScrollTo().assertIsDisplayed().performClick()
-            assertEquals("https://aiot.woowtech.io/docs/troubleshooting/faqs/", urlClicked)
+            assertEquals("https://aiot.woowtech.io/blog/help-center-7/woowtech-aiot-app-365", urlClicked)
 
-            onNodeWithContentDescription(stringResource(commonR.string.connection_error_forum_content_description))
+            onNodeWithContentDescription(stringResource(commonR.string.connection_error_support_content_description))
                 .performScrollTo().assertIsDisplayed().performClick()
-            assertEquals("https://aiot.woowtech.io/c/mobile-apps/android-companion/42", urlClicked)
-
-            onNodeWithContentDescription(stringResource(commonR.string.connection_error_github_content_description))
-                .performScrollTo().assertIsDisplayed().performClick()
-            assertEquals("https://github.com/home-assistant/android/issues", urlClicked)
-
-            onNodeWithContentDescription(stringResource(commonR.string.connection_error_discord_content_description))
-                .performScrollTo().assertIsDisplayed().performClick()
-            assertEquals("https://discord.com/channels/330944238910963714/1284965926336335993", urlClicked)
+            assertEquals("https://aiot.woowtech.io/blog/help-center-7/woowtech-aiot-app-366", urlClicked)
 
             onNodeWithText(stringResource(commonR.string.back)).performScrollTo().assertIsDisplayed().performClick()
             assertTrue(onCloseClicked)

@@ -27,6 +27,9 @@ import io.homeassistant.companion.android.database.widget.WidgetTapAction
 import io.homeassistant.companion.android.util.getAttribute
 import io.homeassistant.companion.android.widgets.BaseWidgetProvider
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -224,25 +227,59 @@ class EntityWidget : BaseWidgetProvider<StaticWidgetEntity, StaticWidgetDao>() {
             loadingViews.setViewVisibility(R.id.widgetTextLayout, View.GONE)
             appWidgetManager.partiallyUpdateAppWidget(appWidgetId, loadingViews)
 
-            var success = false
-            dao.get(appWidgetId)?.let {
-                try {
-                    onEntityPressedWithoutState(
-                        it.entityId,
-                        serverManager.integrationRepository(it.serverId),
-                    )
-                    success = true
-                } catch (e: Exception) {
-                    Timber.e(e, "Unable to send toggle service call")
+            val widget = dao.get(appWidgetId)
+            val entityStateUpdate = try {
+                widget?.let {
+                    serverManager.integrationRepository(it.serverId)
+                        .getEntityUpdates(listOf(it.entityId))
+                        ?.let { updates ->
+                            async(start = CoroutineStart.UNDISPATCHED) {
+                                try {
+                                    updates.firstOrNull()
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Unable to observe entity state after toggle")
+                                    null
+                                }
+                            }
+                        }
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e, "Unable to start entity state observer")
+                null
             }
 
-            if (!success) {
-                Toast.makeText(context, commonR.string.action_failure, Toast.LENGTH_LONG).show()
+            try {
+                var success = false
+                widget?.let {
+                    try {
+                        onEntityPressedWithoutState(
+                            it.entityId,
+                            serverManager.integrationRepository(it.serverId),
+                        )
+                        success = true
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Timber.e(e, "Unable to send toggle service call")
+                    }
+                }
 
-                val views = getWidgetRemoteViews(context, appWidgetId)
-                appWidgetManager.updateAppWidget(appWidgetId, views)
-            } // else update will be triggered by websocket subscription
+                if (!success) {
+                    Toast.makeText(context, commonR.string.action_failure, Toast.LENGTH_LONG).show()
+                    val views = getWidgetRemoteViews(context, appWidgetId)
+                    appWidgetManager.updateAppWidget(appWidgetId, views)
+                } else {
+                    val updatedEntity = awaitEntityStateUpdateOrTimeout(entityStateUpdate)
+                    val views = getWidgetRemoteViews(context, appWidgetId, updatedEntity)
+                    appWidgetManager.updateAppWidget(appWidgetId, views)
+                }
+            } finally {
+                entityStateUpdate?.cancel()
+            }
         }
     }
 

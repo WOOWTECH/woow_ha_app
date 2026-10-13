@@ -6,11 +6,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.onboarding.locationforsecureconnection.LocationForSecureConnectionScreen
 import kotlinx.serialization.Serializable
 
 internal const val URL_SECURITY_LEVEL_DOCUMENTATION =
-    "https://aiot.woowtech.io/docs/getting_started/connection-security-level/"
+    "${AppSupportLinks.CONNECTION}#connection-security-level"
 
 @Serializable
 internal data class LocationForSecureConnectionRoute(val serverId: Int)

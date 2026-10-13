@@ -4,6 +4,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 
 class KeyguardSensorManager : SensorManager {
     companion object {
@@ -42,7 +43,7 @@ class KeyguardSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#keyguard-sensors"
+        return "${AppSupportLinks.SENSORS}#keyguard-sensors"
     }
 
     override val name: Int

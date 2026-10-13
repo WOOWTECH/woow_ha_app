@@ -12,6 +12,7 @@ import android.telephony.TelephonyManager
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNAVAILABLE
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import timber.log.Timber
@@ -26,7 +27,7 @@ class PhoneStateSensorManager : SensorManager {
             commonR.string.sensor_description_phone_state,
             "mdi:phone",
             deviceClass = "enum",
-            docsLink = "https://aiot.woowtech.io/docs/core/sensors#phone-state-sensor",
+            docsLink = "${AppSupportLinks.SENSORS}#phone-state-sensor",
             updateType = SensorManager.BasicSensor.UpdateType.INTENT,
         )
 
@@ -117,7 +118,7 @@ class PhoneStateSensorManager : SensorManager {
     )
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#cellular-provider-sensor"
+        return "${AppSupportLinks.SENSORS}#cellular-provider-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_phone

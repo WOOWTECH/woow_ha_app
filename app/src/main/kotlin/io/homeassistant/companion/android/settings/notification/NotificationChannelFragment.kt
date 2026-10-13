@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import io.homeassistant.companion.android.common.R as commonR
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.settings.addHelpMenuProvider
 import io.homeassistant.companion.android.settings.notification.views.NotificationChannelView
 import io.homeassistant.companion.android.util.compose.HomeAssistantAppTheme
@@ -33,7 +34,7 @@ class NotificationChannelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         addHelpMenuProvider(
-            "https://aiot.woowtech.io/docs/notifications/notifications-basic#notification-channels",
+            "${AppSupportLinks.NOTIFICATIONS}#notification-channels",
         )
     }
 

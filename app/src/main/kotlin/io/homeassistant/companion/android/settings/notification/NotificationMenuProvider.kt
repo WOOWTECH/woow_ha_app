@@ -6,6 +6,7 @@ import android.view.MenuInflater
 import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
 import io.homeassistant.companion.android.R
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 
 abstract class NotificationMenuProvider : MenuProvider {
     final override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -17,7 +18,7 @@ abstract class NotificationMenuProvider : MenuProvider {
             intent =
                 Intent(
                     Intent.ACTION_VIEW,
-                    "https://aiot.woowtech.io/docs/notifications/notifications-basic".toUri(),
+                    AppSupportLinks.NOTIFICATIONS.toUri(),
                 )
         }
     }

@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.core.content.getSystemService
 import io.homeassistant.companion.android.common.R as commonR
 import io.homeassistant.companion.android.common.sensors.SensorManager
+import io.homeassistant.companion.android.common.util.AppSupportLinks
 import io.homeassistant.companion.android.common.util.STATE_UNKNOWN
 import io.homeassistant.companion.android.common.util.isAutomotive
 import timber.log.Timber
@@ -24,7 +25,7 @@ class LastAppSensorManager : SensorManager {
     }
 
     override fun docsLink(): String {
-        return "https://aiot.woowtech.io/docs/core/sensors#last-used-app-sensor"
+        return "${AppSupportLinks.SENSORS}#last-used-app-sensor"
     }
     override val name: Int
         get() = commonR.string.sensor_name_last_app
