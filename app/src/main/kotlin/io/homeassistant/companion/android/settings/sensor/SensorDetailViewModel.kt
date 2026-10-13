@@ -1,6 +1,7 @@
 package io.homeassistant.companion.android.settings.sensor
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -423,6 +424,8 @@ class SensorDetailViewModel @Inject constructor(
     }
 
     /** @return list of [ApplicationInfo] for the [entries] or all visible applications if `null` */
+    // This picker intentionally lists only visible apps; hidden saved packages retain their raw identifier.
+    @SuppressLint("QueryPermissionsNeeded")
     private fun getApplicationInfoForEntries(entries: List<String>?): List<ApplicationInfo?> {
         val packageManager = getApplication<Application>().packageManager
         return if (entries != null) {

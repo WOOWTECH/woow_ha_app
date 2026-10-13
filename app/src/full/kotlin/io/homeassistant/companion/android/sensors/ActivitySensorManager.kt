@@ -260,6 +260,8 @@ class ActivitySensorManager :
 
                 Timber.d("Registering for activity updates.")
                 actReg.requestActivityUpdates(TimeUnit.MINUTES.toMillis(if (fastUpdate) 1 else 2), pendingIntent)
+            } catch (e: SecurityException) {
+                Timber.w(e, "Activity recognition permission was revoked")
             } catch (e: Exception) {
                 Timber.e(e, "Unable to update activity registration")
             }
